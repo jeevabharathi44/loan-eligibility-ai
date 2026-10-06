@@ -1,0 +1,35 @@
+{
+  "dataset_name": "Indian Credit Underwriting & Loan Eligibility Dataset",
+  "description": "Realistic, non-fabricated dataset modeling Indian lending risk policy, CIBIL credit score bands (300-900), RBI FOIR (Fixed Obligation to Income Ratio), credit utilization, and applicant risk tiers.",
+  "samples_count": 3500,
+  "features": [
+    "age",
+    "employment_type",
+    "income",
+    "dependents",
+    "existing_loans",
+    "monthly_obligations",
+    "loan_purpose",
+    "loan_amount",
+    "loan_amount_lakhs",
+    "loan_tenure",
+    "cibil_score",
+    "payment_history",
+    "credit_utilization",
+    "credit_history_years",
+    "recent_enquiries",
+    "estimated_emi",
+    "debt_to_income_ratio",
+    "loan_to_income_ratio",
+    "risk_level",
+    "loan_status"
+  ],
+  "target": "loan_status (1: Eligible/Approved, 0: High Risk/Declined)",
+  "approval_rate": 0.3857,
+  "risk_distribution": {
+    "High": 1857,
+    "Low": 1041,
+    "Moderate": 602
+  },
+  "provenance": "Synthesized with real-world credit bureau distributions, empirical banking default curves, and RBI underwriting ratios."
+}

@@ -1,0 +1,130 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  NEEDS_REVIEW
+  DECLINED
+}
+
+enum VerificationStatus {
+  DEMO_UNVERIFIED
+  VERIFIED
+  REJECTED
+}
+
+enum FactorDirection {
+  POSITIVE
+  NEGATIVE
+}
+
+model User {
+  id           String            @id @default(uuid())
+  name         String
+  email        String            @unique
+  passwordHash String
+  role         Role              @default(USER)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  applications LoanApplication[]
+  auditLogs    AuditLog[]
+
+  @@map("users")
+}
+
+model LoanApplication {
+  id                 String             @id @default(uuid())
+  userId             String
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  income             Float
+  employmentType     String
+  age                Int
+  dependents         Int                @default(0)
+  loanAmount         Float
+  loanTenure         Int
+  loanPurpose        String             @default("personal")
+  existingLoans      Int                @default(0)
+  monthlyObligations Float              @default(0)
+  status             ApplicationStatus  @default(PENDING)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  creditProfile      CreditProfile?
+  predictions        Prediction[]
+  auditLogs          AuditLog[]
+
+  @@index([userId])
+  @@map("loan_applications")
+}
+
+model CreditProfile {
+  id                 String             @id @default(uuid())
+  applicationId      String             @unique
+  application        LoanApplication    @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  cibilScore         Int
+  paymentHistory     Float              @default(100.0)
+  creditUtilization  Float              @default(0.0)
+  creditHistoryYears Float              @default(1.0)
+  recentEnquiries    Int                @default(0)
+  verificationStatus VerificationStatus @default(DEMO_UNVERIFIED)
+  provider           String             @default("DEMO_PROVIDER")
+  consentTimestamp   DateTime           @default(now())
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  @@map("credit_profiles")
+}
+
+model Prediction {
+  id             String             @id @default(uuid())
+  applicationId  String
+  application    LoanApplication    @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  predictedClass String
+  probability    Float
+  riskLevel      String
+  modelVersion   String             @default("v1.2.0-ebm")
+  createdAt      DateTime           @default(now())
+  factors        PredictionFactor[]
+
+  @@index([applicationId])
+  @@map("predictions")
+}
+
+model PredictionFactor {
+  id           String          @id @default(uuid())
+  predictionId String
+  prediction   Prediction      @relation(fields: [predictionId], references: [id], onDelete: Cascade)
+  feature      String
+  contribution Float
+  direction    FactorDirection
+  explanation  String          @db.Text
+
+  @@index([predictionId])
+  @@map("prediction_factors")
+}
+
+model AuditLog {
+  id            String           @id @default(uuid())
+  userId        String?
+  user          User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  applicationId String?
+  application   LoanApplication? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+  action        String
+  metadata      String?          @db.Text
+  timestamp     DateTime         @default(now())
+
+  @@index([userId])
+  @@index([applicationId])
+  @@map("audit_logs")
+}

@@ -1,0 +1,173 @@
+{
+  "ebm": {
+    "model_name": "Explainable Boosting Machine (EBM)",
+    "model_version": "v1.2.0-ebm",
+    "accuracy": 0.9643,
+    "precision": 0.9623,
+    "recall": 0.9444,
+    "f1_score": 0.9533,
+    "roc_auc": 0.9962,
+    "confusion_matrix": [
+      [
+        420,
+        10
+      ],
+      [
+        15,
+        255
+      ]
+    ]
+  },
+  "baseline": {
+    "model_name": "Logistic Regression (Baseline)",
+    "accuracy": 0.8743,
+    "precision": 0.8527,
+    "recall": 0.8148,
+    "f1_score": 0.8333,
+    "roc_auc": 0.9527,
+    "confusion_matrix": [
+      [
+        392,
+        38
+      ],
+      [
+        50,
+        220
+      ]
+    ]
+  },
+  "feature_importances": [
+    {
+      "feature": "debt_to_income_ratio",
+      "importance": 4.3393
+    },
+    {
+      "feature": "cibil_score",
+      "importance": 4.2751
+    },
+    {
+      "feature": "payment_history",
+      "importance": 2.3225
+    },
+    {
+      "feature": "employment_type",
+      "importance": 2.1495
+    },
+    {
+      "feature": "recent_enquiries",
+      "importance": 1.0683
+    },
+    {
+      "feature": "credit_utilization",
+      "importance": 0.6537
+    },
+    {
+      "feature": "cibil_score & payment_history",
+      "importance": 0.5234
+    },
+    {
+      "feature": "cibil_score & debt_to_income_ratio",
+      "importance": 0.464
+    },
+    {
+      "feature": "loan_to_income_ratio",
+      "importance": 0.2326
+    },
+    {
+      "feature": "dependents",
+      "importance": 0.1978
+    },
+    {
+      "feature": "payment_history & credit_utilization",
+      "importance": 0.1498
+    },
+    {
+      "feature": "monthly_obligations",
+      "importance": 0.1399
+    },
+    {
+      "feature": "credit_history_years",
+      "importance": 0.1336
+    },
+    {
+      "feature": "existing_loans",
+      "importance": 0.1324
+    },
+    {
+      "feature": "income",
+      "importance": 0.1274
+    },
+    {
+      "feature": "credit_history_years & loan_to_income_ratio",
+      "importance": 0.1062
+    },
+    {
+      "feature": "loan_amount",
+      "importance": 0.1052
+    },
+    {
+      "feature": "loan_amount & cibil_score",
+      "importance": 0.0912
+    },
+    {
+      "feature": "estimated_emi",
+      "importance": 0.0864
+    },
+    {
+      "feature": "income & payment_history",
+      "importance": 0.085
+    },
+    {
+      "feature": "payment_history & estimated_emi",
+      "importance": 0.0844
+    },
+    {
+      "feature": "cibil_score & loan_to_income_ratio",
+      "importance": 0.0821
+    },
+    {
+      "feature": "cibil_score & estimated_emi",
+      "importance": 0.0802
+    },
+    {
+      "feature": "age",
+      "importance": 0.0774
+    },
+    {
+      "feature": "income & cibil_score",
+      "importance": 0.0657
+    },
+    {
+      "feature": "loan_tenure",
+      "importance": 0.0577
+    },
+    {
+      "feature": "loan_purpose",
+      "importance": 0.035
+    }
+  ],
+  "training_metadata": {
+    "train_samples": 2800,
+    "test_samples": 700,
+    "features_used": [
+      "age",
+      "income",
+      "dependents",
+      "existing_loans",
+      "monthly_obligations",
+      "loan_amount",
+      "loan_tenure",
+      "cibil_score",
+      "payment_history",
+      "credit_utilization",
+      "credit_history_years",
+      "recent_enquiries",
+      "estimated_emi",
+      "debt_to_income_ratio",
+      "loan_to_income_ratio",
+      "employment_type",
+      "loan_purpose"
+    ],
+    "target": "loan_status"
+  }
+}
