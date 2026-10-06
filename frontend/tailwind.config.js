@@ -7,20 +7,34 @@ export default {
   theme: {
     extend: {
       colors: {
-        bg: '#0a0f1e',
-        card: '#0f172a',
-        field: '#1e293b',
-        line: '#334155',
-        ink: '#f1f5f9',
-        mute: '#94a3b8',
-        dim: '#64748b',
-        cy: '#22d3ee',
-        ok: '#4ade80',
-        warn: '#facc15',
-        bad: '#f87171',
+        bg: '#f8fafc',
+        card: '#ffffff',
+        field: '#ffffff',
+        line: '#e2e8f0',
+        ink: '#0f172a',
+        mute: '#64748b',
+        dim: '#94a3b8',
+        cy: '#059669', // Emerald accent from screenshot
+        blue: {
+          500: '#3b82f6',
+          600: '#2563eb', // Royal blue action button
+          700: '#1d4ed8',
+        },
+        emerald: {
+          50: '#ecfdf5',
+          100: '#d1fae5',
+          200: '#a7f3d0',
+          500: '#10b981',
+          600: '#059669',
+          700: '#047857',
+          800: '#065f46',
+        },
+        ok: '#16a34a',
+        warn: '#d97706',
+        bad: '#dc2626',
       },
       fontFamily: {
-        sans: ['"DM Sans"', 'system-ui', 'sans-serif'],
+        sans: ['"DM Sans"', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
       },
     },
   },

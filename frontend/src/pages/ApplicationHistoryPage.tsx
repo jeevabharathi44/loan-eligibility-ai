@@ -58,7 +58,7 @@ export const ApplicationHistoryPage: React.FC<ApplicationHistoryProps> = ({ navi
 
         <button
           onClick={() => navigate('/apply')}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold bg-gradient-to-r from-cy to-blue-600 text-bg shadow-md text-xs hover:opacity-95 transition-all self-start sm:self-auto"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm text-xs transition-all self-start sm:self-auto"
         >
           <PlusCircle className="w-4 h-4" />
           New Application

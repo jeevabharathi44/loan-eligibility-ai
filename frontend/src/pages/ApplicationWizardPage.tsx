@@ -5,16 +5,16 @@ import { CibilGauge } from '../components/CibilGauge';
 import { FactorBar } from '../components/FactorBar';
 import { RiskBadge } from '../components/StatusBadge';
 import {
-  Sparkles,
-  ArrowRight,
+  ShieldCheck,
+  CheckCircle,
+  AlertTriangle,
   RotateCcw,
   Eye,
-  AlertTriangle,
-  Lightbulb,
-  HeartHandshake,
-  CheckCircle2,
+  ArrowRight,
   TrendingUp,
-  HelpCircle,
+  MessageSquare,
+  Sparkles,
+  Lightbulb,
 } from 'lucide-react';
 
 interface ApplicationWizardProps {
@@ -32,6 +32,8 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
   const [profile, setProfile] = useState({
     name: user?.name || 'Arjun Sharma',
     age: '30',
+    gender: 'Male',
+    maritalStatus: 'Single / Unmarried',
     income: '90000',
     job: 'salaried',
     dep: '1',
@@ -62,35 +64,23 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
   const [predictionResult, setPredictionResult] = useState<any>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Humanized Personas with relatable life stories
+  // Sample Profiles matching screenshot personas
   const SAMPLES = [
     {
-      id: 'arjun',
-      icon: '👨‍💼',
-      name: 'Arjun Sharma',
-      tag: 'Prime Salaried (₹90k/mo)',
-      story: 'Buying a family home',
-      p: { name: 'Arjun Sharma', age: '30', income: '90000', job: 'salaried', dep: '1' },
+      label: '👨‍💼 Arjun (Prime)',
+      p: { name: 'Arjun Sharma', age: '30', gender: 'Male', maritalStatus: 'Single / Unmarried', income: '90000', job: 'salaried', dep: '1' },
       l: { amountLakhs: '8', tenure: '36', purpose: 'home', existingLoans: '1', monthlyObligations: '5000' },
       c: { score: '780', pay: '98', util: '20', yrs: '8', enq: '1', providerMode: 'mock', consent: true },
     },
     {
-      id: 'meena',
-      icon: '👩‍🍳',
-      name: 'Meena Patel',
-      tag: 'Self-Employed (₹45k/mo)',
-      story: 'Expanding catering bakery',
-      p: { name: 'Meena Patel', age: '42', income: '45000', job: 'self_employed', dep: '2' },
+      label: '👩‍🍳 Meena (Review)',
+      p: { name: 'Meena Patel', age: '42', gender: 'Female', maritalStatus: 'Married', income: '45000', job: 'self', dep: '2' },
       l: { amountLakhs: '12', tenure: '48', purpose: 'business', existingLoans: '2', monthlyObligations: '8000' },
       c: { score: '690', pay: '88', util: '55', yrs: '5', enq: '3', providerMode: 'mock', consent: true },
     },
     {
-      id: 'rajan',
-      icon: '👨‍🔧',
-      name: 'Rajan Verma',
-      tag: 'High Debt Load (₹25k/mo)',
-      story: 'Emergency debt relief',
-      p: { name: 'Rajan Verma', age: '55', income: '25000', job: 'self_employed', dep: '4' },
+      label: '👨‍🔧 Rajan (Declined)',
+      p: { name: 'Rajan Verma', age: '55', gender: 'Male', maritalStatus: 'Married', income: '25000', job: 'self', dep: '4' },
       l: { amountLakhs: '30', tenure: '60', purpose: 'personal', existingLoans: '3', monthlyObligations: '12000' },
       c: { score: '520', pay: '60', util: '90', yrs: '2', enq: '6', providerMode: 'mock', consent: true },
     },
@@ -129,13 +119,13 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
   // Step 1 Validation
   const validateStep1 = () => {
     const errs: Record<string, string> = {};
-    if (!profile.name || profile.name.trim().length < 2) errs.name = 'Please provide your full name as on government ID';
+    if (!profile.name || profile.name.trim().length < 2) errs.name = 'Full name is required';
     const age = parseInt(profile.age);
     if (isNaN(age) || age < 18 || age > 75) errs.age = 'Age must be between 18 and 75';
     const inc = parseFloat(profile.income);
     if (isNaN(inc) || inc < 5000) errs.income = 'Minimum monthly income is ₹5,000';
     const dep = parseInt(profile.dep);
-    if (isNaN(dep) || dep < 0 || dep > 10) errs.dep = 'Dependents must be between 0 and 10';
+    if (isNaN(dep) || dep < 0 || dep > 10) errs.dep = 'Dependents must be 0-10';
 
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -145,32 +135,32 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
   const validateStep2 = () => {
     const errs: Record<string, string> = {};
     const amt = parseFloat(loan.amountLakhs);
-    if (isNaN(amt) || amt < 0.5 || amt > 500) errs.amount = 'Loan amount must be between 0.5 and 500 Lakhs';
+    if (isNaN(amt) || amt < 0.5 || amt > 500) errs.amount = 'Loan amount must be 0.5 - 500 Lakhs';
     const tenure = parseInt(loan.tenure);
-    if (isNaN(tenure) || tenure < 6 || tenure > 360) errs.tenure = 'Tenure must be between 6 and 360 months';
+    if (isNaN(tenure) || tenure < 6 || tenure > 360) errs.tenure = 'Tenure must be 6 - 360 months';
     const exLoans = parseInt(loan.existingLoans);
-    if (isNaN(exLoans) || exLoans < 0 || exLoans > 10) errs.existingLoans = 'Enter 0 to 10 active loans';
+    if (isNaN(exLoans) || exLoans < 0 || exLoans > 10) errs.existingLoans = 'Enter 0 - 10 active loans';
     const obligations = parseFloat(loan.monthlyObligations);
-    if (isNaN(obligations) || obligations < 0) errs.obligations = 'Enter valid monthly debt obligations';
+    if (isNaN(obligations) || obligations < 0) errs.obligations = 'Enter valid monthly obligations';
 
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
 
-  // Step 3 Validation & Execution
+  // Step 3 Validation & Submit
   const validateAndSubmit = async () => {
     const errs: Record<string, string> = {};
     const score = parseInt(credit.score);
-    if (isNaN(score) || score < 300 || score > 900) errs.score = 'Enter a valid CIBIL score between 300 and 900';
+    if (isNaN(score) || score < 300 || score > 900) errs.score = 'Enter a valid CIBIL score (300-900)';
     const pay = parseFloat(credit.pay);
-    if (isNaN(pay) || pay < 0 || pay > 100) errs.pay = 'Repayment history must be 0-100%';
+    if (isNaN(pay) || pay < 0 || pay > 100) errs.pay = 'Enter 0-100%';
     const util = parseFloat(credit.util);
-    if (isNaN(util) || util < 0 || util > 100) errs.util = 'Card utilization must be 0-100%';
+    if (isNaN(util) || util < 0 || util > 100) errs.util = 'Enter 0-100%';
     const yrs = parseFloat(credit.yrs);
-    if (isNaN(yrs) || yrs < 0 || yrs > 50) errs.yrs = 'History length must be 0-50 years';
+    if (isNaN(yrs) || yrs < 0 || yrs > 50) errs.yrs = 'Enter 0-50 years';
     const enq = parseInt(credit.enq);
-    if (isNaN(enq) || enq < 0 || enq > 20) errs.enq = 'Enquiries must be 0-20';
-    if (!credit.consent) errs.consent = 'Your consent is required to perform credit risk verification';
+    if (isNaN(enq) || enq < 0 || enq > 20) errs.enq = 'Enter 0-20 enquiries';
+    if (!credit.consent) errs.consent = 'Consent is required to evaluate credit profile';
 
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
@@ -179,7 +169,6 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
     setError('');
 
     try {
-      // 1. Create Application
       const appPayload = {
         income: parseFloat(profile.income),
         employmentType: profile.job === 'self' ? 'self_employed' : profile.job,
@@ -195,7 +184,6 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
       const createdApp = await createApplicationApi(appPayload);
       setSavedApplicationId(createdApp.id);
 
-      // 2. Verify Credit
       await verifyCreditApi({
         applicationId: createdApp.id,
         cibilScore: parseInt(credit.score),
@@ -207,16 +195,13 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
         providerMode: credit.providerMode,
       });
 
-      // 3. Trigger EBM ML Prediction
       const predictionData = await runPredictionApi(createdApp.id);
       setPredictionResult(predictionData);
 
       setStep(4);
     } catch (err: any) {
-      console.error('Application pipeline failed:', err);
-      setError(
-        err.response?.data?.message || err.message || 'Underwriting pipeline encountered an error. Please try again.'
-      );
+      console.error('Underwriting pipeline failed:', err);
+      setError(err.response?.data?.message || err.message || 'Underwriting pipeline failed. Please retry.');
     } finally {
       setLoading(false);
     }
@@ -230,442 +215,487 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
     setError('');
   };
 
-  // Coaching tips tailored to outcome
-  const getCoachingTips = () => {
-    if (!predictionResult) return [];
-    if (predictionResult.predicted_class === 'Approved') {
-      return [
-        '🌿 Keep your revolving card balances below 20% before submitting formal bank papers.',
-        '📑 Gather 3 months of bank statements and your last 2 years of Form 16 / ITR.',
-        '🌟 Your prime score puts you in line for the lowest available interest rate tier.',
-      ];
-    } else if (predictionResult.predicted_class === 'Needs Review') {
-      return [
-        '💡 Consider extending your loan tenure by 12–24 months to bring your monthly EMI into the optimal safe zone.',
-        '💳 Pay down your highest-interest credit card balance to reduce credit utilization under 30%.',
-        '💼 Providing audited income proof (ITR-V) or proof of supplementary income can help flip this to an approval.',
-      ];
-    } else {
-      return [
-        '🎯 Settle any past-due accounts or disputed records with your bank to stop negative CIBIL reporting.',
-        '📉 Focus on reducing your total credit card utilization from ' + credit.util + '% to under 30% over the next 3 to 6 months.',
-        '🤝 You can dramatically improve your eligibility by applying with an employed co-borrower or offering collateral.',
-      ];
-    }
-  };
-
   return (
-    <div className="py-8 px-4 max-w-2xl mx-auto">
-      {/* Title Header with warm welcoming tone */}
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-cy/10 border border-cy/25 text-cy text-xs font-semibold uppercase tracking-wider mb-3">
-          <HeartHandshake className="w-3.5 h-3.5" />
-          Empathetic Financial Assessment
+    <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+      
+      {/* 1. Header Banner Card matching screenshot */}
+      <div className="app-card p-6 sm:p-7 mb-6 relative overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs font-semibold mb-3">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Data Minimization • Zero Identity Documents Stored</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+              Citizen Demographic Profile
+            </h1>
+            <p className="text-slate-500 text-xs sm:text-sm mt-1 max-w-xl">
+              Complete the 4 brief steps below to enable deterministic eligibility evaluation across explainable EBM credit models.
+            </p>
+          </div>
+
+          <button
+            onClick={() => {
+              if (step === 1 && validateStep1()) setStep(2);
+              else if (step === 2 && validateStep2()) setStep(3);
+              else if (step === 3) validateAndSubmit();
+            }}
+            disabled={loading}
+            className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm text-sm shrink-0 transition-all self-start sm:self-center disabled:opacity-50"
+          >
+            {loading ? (
+              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <CheckCircle className="w-4 h-4" />
+            )}
+            <span>{step === 4 ? 'Assessment Complete' : 'Check Eligibility Now →'}</span>
+          </button>
         </div>
-        <h1 className="text-3xl sm:text-5xl font-black tracking-tight mb-2">
-          Loan <span className="text-cy">Eligibility</span> AI
-        </h1>
-        <p className="text-mute text-sm max-w-md mx-auto">
-          Honest, transparent loan guidance with clear explanations and personalized financial tips
-        </p>
       </div>
 
-      {/* Progress Pills */}
-      <div className="flex justify-center flex-wrap gap-2 mb-6">
-        {[
-          { num: 1, label: 'About You' },
-          { num: 2, label: 'Loan Goals' },
-          { num: 3, label: 'Credit Health' },
-          { num: 4, label: 'Clear Decision' },
-        ].map((item) => (
-          <div
-            key={item.num}
-            className={`pill ${step === item.num ? 'on' : step > item.num ? 'done' : ''}`}
-          >
-            <b>{step > item.num ? '✓' : item.num}</b>
-            <span>{item.label}</span>
-          </div>
-        ))}
+      {/* 2. Step Progress Breadcrumb Card matching screenshot */}
+      <div className="app-card p-4 sm:p-5 mb-6">
+        <div className="flex items-center justify-between relative px-2 sm:px-6">
+          {/* Background connecting bar */}
+          <div className="absolute top-1/2 left-8 right-8 h-0.5 bg-slate-200 -translate-y-2 z-0" />
+
+          {[
+            { num: 1, label: 'Basic Info' },
+            { num: 2, label: 'Loan Goals' },
+            { num: 3, label: 'Credit & CIBIL' },
+            { num: 4, label: 'Assessment' },
+          ].map((item) => (
+            <div
+              key={item.num}
+              onClick={() => {
+                if (item.num < step) setStep(item.num);
+              }}
+              className="flex flex-col items-center relative z-10 cursor-pointer"
+            >
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all shadow-sm ${
+                  step === item.num
+                    ? 'bg-blue-600 text-white ring-4 ring-blue-100'
+                    : step > item.num
+                    ? 'bg-emerald-600 text-white'
+                    : 'bg-white border-2 border-slate-300 text-slate-500'
+                }`}
+              >
+                {step > item.num ? '✓' : item.num}
+              </div>
+              <span
+                className={`text-xs mt-2 font-semibold ${
+                  step === item.num ? 'text-blue-600 font-bold' : step > item.num ? 'text-emerald-700' : 'text-slate-500'
+                }`}
+              >
+                {item.label}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
 
       {error && (
-        <div className="mb-6 p-4 rounded-xl bg-bad/10 border border-bad/30 text-bad text-xs flex items-center gap-2">
+        <div className="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
-      {/* Main Multi-Step Card */}
+      {/* 3. Main Step Form Card matching screenshot */}
       <div className="app-card p-6 sm:p-8">
-        {/* STEP 1: About You */}
+        
+        {/* STEP 1: Basic Demographics */}
         {step === 1 && (
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-xl font-bold text-ink">First, tell us about yourself</h2>
-              <span className="text-xs text-cy font-medium">Step 1 of 4</span>
-            </div>
-            <p className="text-mute text-xs mb-5">
-              We look at your overall earning stability rather than just raw numbers.
-            </p>
-
-            {/* Persona Quick Buttons with human descriptions */}
             <div className="mb-6">
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
-                Try a sample profile:
+              <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">
+                STEP 1 OF 4
               </span>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                {SAMPLES.map((s) => (
-                  <button
-                    key={s.id}
-                    type="button"
-                    onClick={() => loadSample(s)}
-                    className="p-3 rounded-xl bg-field hover:border-cy text-ink border border-line text-left transition-all group"
-                  >
-                    <div className="text-xs font-bold text-ink flex items-center gap-1.5">
-                      <span>{s.icon}</span>
-                      <span>{s.name}</span>
-                    </div>
-                    <div className="text-[10px] text-cy font-semibold mt-0.5">{s.tag}</div>
-                    <div className="text-[10px] text-mute mt-1">{s.story}</div>
-                  </button>
-                ))}
-              </div>
+              <h2 className="text-xl font-black text-slate-900 mt-0.5">
+                Basic Demographics
+              </h2>
+              <p className="text-xs text-slate-500 mt-1">
+                Fundamental age, employment stability, and cash flow parameters used to evaluate risk.
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="sm:col-span-2">
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-[11px] font-bold text-mute uppercase tracking-wider">
-                    Full Name
-                  </label>
-                  <span className="text-[10px] text-dim">As shown on PAN / Aadhaar</span>
-                </div>
+            {/* Quick Demo Fill Buttons */}
+            <div className="mb-6 p-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-wrap items-center gap-2">
+              <span className="text-xs font-bold text-slate-600 mr-1">Demo profiles:</span>
+              {SAMPLES.map((s, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => loadSample(s)}
+                  className="px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:border-emerald-500 text-xs font-semibold text-slate-700 hover:text-emerald-700 shadow-2xs transition-all"
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Full Name <span className="text-rose-500">*</span>
+                </label>
                 <input
                   type="text"
                   value={profile.name}
                   onChange={(e) => setProfile({ ...profile, name: e.target.value })}
                   placeholder="e.g. Arjun Sharma"
-                  className="w-full bg-field/60 border border-line rounded-xl px-3.5 py-2.5 text-sm text-ink focus:outline-none focus:border-cy"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                 />
-                {errors.name && <p className="text-bad text-[11px] mt-1">{errors.name}</p>}
+                <span className="text-[11px] text-slate-500 mt-1 block">
+                  Evaluates identification record against credit bureau repositories.
+                </span>
+                {errors.name && <p className="text-rose-600 text-[11px] mt-1">{errors.name}</p>}
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-[11px] font-bold text-mute uppercase tracking-wider">
-                    Your Age
-                  </label>
-                  <span className="text-[10px] text-dim">18–75 years</span>
-                </div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Age (in complete years) <span className="text-rose-500">*</span>
+                </label>
                 <input
                   type="number"
                   value={profile.age}
                   onChange={(e) => setProfile({ ...profile, age: e.target.value })}
-                  className="w-full bg-field/60 border border-line rounded-xl px-3.5 py-2.5 text-sm text-ink focus:outline-none focus:border-cy"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                 />
-                {errors.age && <p className="text-bad text-[11px] mt-1">{errors.age}</p>}
+                <span className="text-[11px] text-slate-500 mt-1 block">
+                  Evaluates criteria for repayment longevity and career vintage.
+                </span>
+                {errors.age && <p className="text-rose-600 text-[11px] mt-1">{errors.age}</p>}
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-mute uppercase tracking-wider mb-1">
-                  Employment Stability
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Gender <span className="text-rose-500">*</span>
+                </label>
+                <select
+                  value={profile.gender}
+                  onChange={(e) => setProfile({ ...profile, gender: e.target.value })}
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                >
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+                <span className="text-[11px] text-slate-500 mt-1 block">
+                  Collected for demographic compliance and affirmative scheme lending.
+                </span>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Marital Status
+                </label>
+                <select
+                  value={profile.maritalStatus}
+                  onChange={(e) => setProfile({ ...profile, maritalStatus: e.target.value })}
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                >
+                  <option value="Single / Unmarried">Single / Unmarried</option>
+                  <option value="Married">Married</option>
+                  <option value="Divorced">Divorced</option>
+                </select>
+                <span className="text-[11px] text-slate-500 mt-1 block">
+                  Enables household cash flow and co-borrower eligibility.
+                </span>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Employment Stability <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={profile.job}
                   onChange={(e) => setProfile({ ...profile, job: e.target.value })}
-                  className="w-full bg-field/60 border border-line rounded-xl px-3.5 py-2.5 text-sm text-ink focus:outline-none focus:border-cy"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                 >
-                  <option value="salaried">Salaried (Steady Monthly Paycheck)</option>
+                  <option value="salaried">Salaried (Predictable Monthly Paycheck)</option>
                   <option value="self">Self-Employed / Business Owner</option>
                   <option value="none">Currently Not Employed</option>
                 </select>
+                <span className="text-[11px] text-slate-500 mt-1 block">
+                  Strictly enforced for regular income verification.
+                </span>
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-[11px] font-bold text-mute uppercase tracking-wider">
-                    Monthly Take-Home Income
-                  </label>
-                  <span className="text-[10px] text-ok">Net in-hand</span>
-                </div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Monthly Net Take-Home Income (₹) <span className="text-rose-500">*</span>
+                </label>
                 <input
                   type="number"
                   value={profile.income}
                   onChange={(e) => setProfile({ ...profile, income: e.target.value })}
-                  className="w-full bg-field/60 border border-line rounded-xl px-3.5 py-2.5 text-sm text-ink focus:outline-none focus:border-cy"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                 />
-                {errors.income && <p className="text-bad text-[11px] mt-1">{errors.income}</p>}
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-[11px] font-bold text-mute uppercase tracking-wider">
-                    Financial Dependents
-                  </label>
-                  <span className="text-[10px] text-dim">Family members</span>
-                </div>
-                <input
-                  type="number"
-                  value={profile.dep}
-                  onChange={(e) => setProfile({ ...profile, dep: e.target.value })}
-                  className="w-full bg-field/60 border border-line rounded-xl px-3.5 py-2.5 text-sm text-ink focus:outline-none focus:border-cy"
-                />
-                {errors.dep && <p className="text-bad text-[11px] mt-1">{errors.dep}</p>}
+                <span className="text-[11px] text-slate-500 mt-1 block">
+                  Required for Fixed Obligation to Income Ratio (FOIR).
+                </span>
+                {errors.income && <p className="text-rose-600 text-[11px] mt-1">{errors.income}</p>}
               </div>
             </div>
 
-            <div className="flex gap-3 mt-6">
+            <div className="flex justify-end gap-3 mt-8 pt-5 border-t border-slate-200">
               <button
                 type="button"
                 onClick={() => {
                   if (validateStep1()) setStep(2);
                 }}
-                className="w-full py-3 rounded-xl font-bold bg-gradient-to-r from-cy to-blue-600 text-bg hover:opacity-95 transition-opacity text-sm flex items-center justify-center gap-2"
+                className="px-6 py-2.5 rounded-xl font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm text-sm flex items-center gap-2 transition-all"
               >
-                Continue to Loan Goals
-                <ArrowRight className="w-4 h-4" />
+                Next: Loan Goals →
               </button>
             </div>
           </div>
         )}
 
-        {/* STEP 2: Loan Goals & Live Affordability Calculator */}
+        {/* STEP 2: Loan Goals & Affordability */}
         {step === 2 && (
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-xl font-bold text-ink">What are your loan goals?</h2>
-              <span className="text-xs text-cy font-medium">Step 2 of 4</span>
+            <div className="mb-6">
+              <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">
+                STEP 2 OF 4
+              </span>
+              <h2 className="text-xl font-black text-slate-900 mt-0.5">
+                Loan Goals & Exposure Limits
+              </h2>
+              <p className="text-xs text-slate-500 mt-1">
+                Configure your requested principal and repayment tenure.
+              </p>
             </div>
-            <p className="text-mute text-xs mb-5">
-              Let's tailor the loan size and timeline to keep your monthly budget comfortable.
-            </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
-                <label className="block text-[11px] font-bold text-mute uppercase tracking-wider mb-1">
-                  Loan Amount (₹ Lakh)
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Requested Principal (₹ Lakh) <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="number"
                   step="0.5"
                   value={loan.amountLakhs}
                   onChange={(e) => setLoan({ ...loan, amountLakhs: e.target.value })}
-                  className="w-full bg-field/60 border border-line rounded-xl px-3.5 py-2.5 text-sm text-ink focus:outline-none focus:border-cy"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-                <span className="text-[10px] text-cy block mt-1">
-                  Principal: ₹{(parseFloat(loan.amountLakhs) * 100000 || 0).toLocaleString('en-IN')}
+                <span className="text-[11px] text-emerald-700 font-semibold mt-1 block">
+                  Equivalent to ₹{(parseFloat(loan.amountLakhs) * 100000 || 0).toLocaleString('en-IN')}
                 </span>
-                {errors.amount && <p className="text-bad text-[11px] mt-1">{errors.amount}</p>}
+                {errors.amount && <p className="text-rose-600 text-[11px] mt-1">{errors.amount}</p>}
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-mute uppercase tracking-wider mb-1">
-                  Repayment Horizon
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Tenure (Months) <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={loan.tenure}
                   onChange={(e) => setLoan({ ...loan, tenure: e.target.value })}
-                  className="w-full bg-field/60 border border-line rounded-xl px-3.5 py-2.5 text-sm text-ink focus:outline-none focus:border-cy"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
-                  <option value="12">1 Year (12 Months - Fast Paydown)</option>
-                  <option value="24">2 Years (24 Months)</option>
-                  <option value="36">3 Years (36 Months - Popular)</option>
-                  <option value="48">4 Years (48 Months)</option>
-                  <option value="60">5 Years (60 Months - Low EMI)</option>
-                  <option value="84">7 Years (84 Months)</option>
-                  <option value="120">10 Years (120 Months - Long term)</option>
-                  <option value="240">20 Years (240 Months - Home Loan)</option>
+                  <option value="12">12 Months (1 Year)</option>
+                  <option value="24">24 Months (2 Years)</option>
+                  <option value="36">36 Months (3 Years - Recommended)</option>
+                  <option value="48">48 Months (4 Years)</option>
+                  <option value="60">60 Months (5 Years)</option>
+                  <option value="120">120 Months (10 Years)</option>
+                  <option value="240">240 Months (20 Years)</option>
                 </select>
-                {errors.tenure && <p className="text-bad text-[11px] mt-1">{errors.tenure}</p>}
+                <span className="text-[11px] text-slate-500 mt-1 block">
+                  {(parseInt(loan.tenure) / 12 || 0).toFixed(1)} years repayment schedule.
+                </span>
+                {errors.tenure && <p className="text-rose-600 text-[11px] mt-1">{errors.tenure}</p>}
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-mute uppercase tracking-wider mb-1">
-                  Loan Purpose
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Loan Purpose <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={loan.purpose}
                   onChange={(e) => setLoan({ ...loan, purpose: e.target.value })}
-                  className="w-full bg-field/60 border border-line rounded-xl px-3.5 py-2.5 text-sm text-ink focus:outline-none focus:border-cy"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
-                  <option value="home">🏡 Home Purchase / Renovation</option>
-                  <option value="business">💼 Business Growth / Equipment</option>
-                  <option value="education">🎓 Education & Upskilling</option>
-                  <option value="vehicle">🚗 Vehicle Purchase</option>
-                  <option value="personal">🛍️ Personal & Medical Needs</option>
+                  <option value="home">Home Purchase / Construction</option>
+                  <option value="business">Business Expansion / Working Capital</option>
+                  <option value="education">Higher Education & Tuition</option>
+                  <option value="vehicle">Vehicle Acquisition</option>
+                  <option value="personal">Personal / Medical Expenses</option>
                 </select>
+                <span className="text-[11px] text-slate-500 mt-1 block">
+                  Purpose determines risk weighting under banking guidelines.
+                </span>
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-mute uppercase tracking-wider mb-1">
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
                   Active Existing Loans
                 </label>
                 <input
                   type="number"
                   value={loan.existingLoans}
                   onChange={(e) => setLoan({ ...loan, existingLoans: e.target.value })}
-                  className="w-full bg-field/60 border border-line rounded-xl px-3.5 py-2.5 text-sm text-ink focus:outline-none focus:border-cy"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-                {errors.existingLoans && <p className="text-bad text-[11px] mt-1">{errors.existingLoans}</p>}
+                <span className="text-[11px] text-slate-500 mt-1 block">
+                  Number of active open borrowing facilities.
+                </span>
+                {errors.existingLoans && <p className="text-rose-600 text-[11px] mt-1">{errors.existingLoans}</p>}
               </div>
 
               <div className="sm:col-span-2">
-                <label className="block text-[11px] font-bold text-mute uppercase tracking-wider mb-1">
-                  Existing Monthly Debt Obligations (₹)
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Current Monthly Debt Obligations (₹ EMI)
                 </label>
                 <input
                   type="number"
                   value={loan.monthlyObligations}
                   onChange={(e) => setLoan({ ...loan, monthlyObligations: e.target.value })}
-                  className="w-full bg-field/60 border border-line rounded-xl px-3.5 py-2.5 text-sm text-ink focus:outline-none focus:border-cy"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-                {errors.obligations && <p className="text-bad text-[11px] mt-1">{errors.obligations}</p>}
+                <span className="text-[11px] text-slate-500 mt-1 block">
+                  Total EMIs currently paid toward existing facilities.
+                </span>
               </div>
             </div>
 
-            {/* Humanized Live Affordability Card */}
-            <div className="mt-5 p-4 rounded-xl bg-field/50 border border-line text-xs">
+            {/* Ratio preview card */}
+            <div className="mt-6 p-4 rounded-xl bg-slate-50 border border-slate-200">
               <div className="flex items-center justify-between mb-2">
-                <span className="font-bold text-slate-300 flex items-center gap-1.5 text-xs">
-                  <TrendingUp className="w-3.5 h-3.5 text-cy" />
-                  Your Affordability Preview (10.5% p.a.)
+                <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                  <TrendingUp className="w-4 h-4 text-emerald-600" />
+                  Estimated Monthly EMI & Debt Servicing
                 </span>
-                <span className="text-cyan-400 font-extrabold text-sm">
+                <span className="text-sm font-black text-blue-600">
                   ₹{derived.emi.toLocaleString('en-IN')} / mo
                 </span>
               </div>
-
-              <div className="grid grid-cols-2 gap-2 text-center my-2">
-                <div className="p-2.5 rounded-lg bg-card border border-line/60">
-                  <div className="text-[10px] text-mute">Debt-to-Income (DTI)</div>
-                  <div className={`text-base font-extrabold ${parseFloat(derived.dti) > 55 ? 'text-bad' : 'text-ok'}`}>
+              <div className="grid grid-cols-2 gap-3 text-center my-2 text-xs">
+                <div className="p-2.5 rounded-lg bg-white border border-slate-200">
+                  <span className="text-[10px] text-slate-500 block">Debt-to-Income (DTI)</span>
+                  <span className={`text-sm font-black ${parseFloat(derived.dti) > 50 ? 'text-rose-600' : 'text-emerald-600'}`}>
                     {derived.dti}%
-                  </div>
-                  <span className="text-[10px] text-dim block mt-0.5">
-                    {parseFloat(derived.dti) <= 40 ? 'Safe & Manageable' : 'Approaching upper limit'}
                   </span>
                 </div>
-
-                <div className="p-2.5 rounded-lg bg-card border border-line/60">
-                  <div className="text-[10px] text-mute">Loan-to-Income (LTI)</div>
-                  <div className={`text-base font-extrabold ${parseFloat(derived.lti) > 4 ? 'text-warn' : 'text-ok'}`}>
-                    {derived.lti}x
-                  </div>
-                  <span className="text-[10px] text-dim block mt-0.5">Annual income multiple</span>
+                <div className="p-2.5 rounded-lg bg-white border border-slate-200">
+                  <span className="text-[10px] text-slate-500 block">Loan-to-Income</span>
+                  <span className="text-sm font-black text-slate-800">
+                    {derived.lti}x annual
+                  </span>
                 </div>
               </div>
-
-              <p className="text-[11px] text-slate-300 mt-2 leading-relaxed bg-card/60 p-2.5 rounded-lg border border-line/40">
-                {parseFloat(derived.dti) <= 45 ? (
-                  <span>🌿 <strong>Looking great:</strong> Your estimated payment leaves ample room in your monthly cash flow for personal expenses and savings.</span>
-                ) : (
-                  <span>💡 <strong>Tip:</strong> You can lower your monthly commitment by extending your tenure to reduce payment pressure.</span>
-                )}
-              </p>
             </div>
 
-            <div className="flex gap-3 mt-6">
+            <div className="flex justify-between gap-3 mt-8 pt-5 border-t border-slate-200">
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="py-3 px-5 rounded-xl font-bold bg-field text-ink hover:bg-line/40 transition-colors text-sm"
+                className="px-5 py-2.5 rounded-xl font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm"
               >
-                Back
+                ← Back
               </button>
               <button
                 type="button"
                 onClick={() => {
                   if (validateStep2()) setStep(3);
                 }}
-                className="flex-1 py-3 rounded-xl font-bold bg-gradient-to-r from-cy to-blue-600 text-bg hover:opacity-95 transition-opacity text-sm flex items-center justify-center gap-2"
+                className="px-6 py-2.5 rounded-xl font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm text-sm"
               >
-                Next: Credit Health
-                <ArrowRight className="w-4 h-4" />
+                Next: Credit & CIBIL →
               </button>
             </div>
           </div>
         )}
 
-        {/* STEP 3: Credit Health & CIBIL Verifier */}
+        {/* STEP 3: Credit & CIBIL Check */}
         {step === 3 && (
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-xl font-bold text-ink">Let's check your credit health</h2>
-              <span className="text-xs text-cy font-medium">Step 3 of 4</span>
+            <div className="mb-6">
+              <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">
+                STEP 3 OF 4
+              </span>
+              <h2 className="text-xl font-black text-slate-900 mt-0.5">
+                Credit & CIBIL Score Verification
+              </h2>
+              <p className="text-xs text-slate-500 mt-1">
+                Validate your credit score consistency against credit utilization and payment records.
+              </p>
             </div>
-            <p className="text-mute text-xs mb-4">
-              Your credit score reflects your past habits. Let's make sure everything matches up.
-            </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-4">
               <div className="sm:col-span-2">
-                <label className="block text-[11px] font-bold text-mute uppercase tracking-wider mb-1">
-                  CIBIL Score (300-900)
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  CIBIL Score (300-900) <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="number"
                   value={credit.score}
                   onChange={(e) => setCredit({ ...credit, score: e.target.value })}
-                  placeholder="e.g. 740"
-                  className="w-full bg-field/60 border border-line rounded-xl px-3.5 py-2.5 text-sm text-ink focus:outline-none focus:border-cy"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-                {errors.score && <p className="text-bad text-[11px] mt-1">{errors.score}</p>}
+                <span className="text-[11px] text-slate-500 mt-1 block">
+                  Self-declared credit bureau score (TransUnion CIBIL).
+                </span>
+                {errors.score && <p className="text-rose-600 text-[11px] mt-1">{errors.score}</p>}
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-mute uppercase tracking-wider mb-1">
-                  On-Time Payments (%)
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  On-Time Repayment History (%)
                 </label>
                 <input
                   type="number"
                   value={credit.pay}
                   onChange={(e) => setCredit({ ...credit, pay: e.target.value })}
-                  className="w-full bg-field/60 border border-line rounded-xl px-3.5 py-2.5 text-sm text-ink focus:outline-none focus:border-cy"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-                {errors.pay && <p className="text-bad text-[11px] mt-1">{errors.pay}</p>}
+                <span className="text-[11px] text-slate-500 mt-1 block">Percentage of EMI payments on time.</span>
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-mute uppercase tracking-wider mb-1">
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
                   Credit Card Utilization (%)
                 </label>
                 <input
                   type="number"
                   value={credit.util}
                   onChange={(e) => setCredit({ ...credit, util: e.target.value })}
-                  className="w-full bg-field/60 border border-line rounded-xl px-3.5 py-2.5 text-sm text-ink focus:outline-none focus:border-cy"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-                {errors.util && <p className="text-bad text-[11px] mt-1">{errors.util}</p>}
+                <span className="text-[11px] text-slate-500 mt-1 block">Card balance divided by limit (ideal &lt; 30%).</span>
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-mute uppercase tracking-wider mb-1">
-                  Credit History Vintage (Years)
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Credit Vintage (Years)
                 </label>
                 <input
                   type="number"
                   value={credit.yrs}
                   onChange={(e) => setCredit({ ...credit, yrs: e.target.value })}
-                  className="w-full bg-field/60 border border-line rounded-xl px-3.5 py-2.5 text-sm text-ink focus:outline-none focus:border-cy"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-                {errors.yrs && <p className="text-bad text-[11px] mt-1">{errors.yrs}</p>}
+                <span className="text-[11px] text-slate-500 mt-1 block">Years since first credit facility opened.</span>
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-mute uppercase tracking-wider mb-1">
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
                   Recent Inquiries (Last 6 Months)
                 </label>
                 <input
                   type="number"
                   value={credit.enq}
                   onChange={(e) => setCredit({ ...credit, enq: e.target.value })}
-                  className="w-full bg-field/60 border border-line rounded-xl px-3.5 py-2.5 text-sm text-ink focus:outline-none focus:border-cy"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-                {errors.enq && <p className="text-bad text-[11px] mt-1">{errors.enq}</p>}
+                <span className="text-[11px] text-slate-500 mt-1 block">Hard inquiries by lenders.</span>
               </div>
             </div>
 
-            {/* Interactive CIBIL Gauge with needle marker */}
+            {/* CIBIL Gauge */}
             <CibilGauge
               score={parseInt(credit.score) || 300}
               paymentHistory={parseFloat(credit.pay) || 0}
@@ -674,106 +704,71 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
               recentEnquiries={parseInt(credit.enq) || 0}
             />
 
-            {/* Provider Mode Selection */}
-            <div className="mt-4 p-3.5 rounded-xl bg-field/50 border border-line space-y-2">
-              <span className="text-[10px] font-bold text-mute uppercase tracking-wider block">
-                Verification Mode
-              </span>
-              <div className="flex gap-2">
-                <label className="flex-1 flex items-center gap-2 p-2.5 rounded-lg bg-card border border-line text-xs cursor-pointer">
-                  <input
-                    type="radio"
-                    name="providerMode"
-                    checked={credit.providerMode === 'mock'}
-                    onChange={() => setCredit({ ...credit, providerMode: 'mock' })}
-                    className="accent-cy"
-                  />
-                  <span>
-                    <strong className="block text-ink">Demo Mode</strong>
-                    <span className="text-[10px] text-mute">Manual data (Unverified demo)</span>
-                  </span>
-                </label>
-                <label className="flex-1 flex items-center gap-2 p-2.5 rounded-lg bg-card border border-line text-xs cursor-pointer">
-                  <input
-                    type="radio"
-                    name="providerMode"
-                    checked={credit.providerMode === 'verified'}
-                    onChange={() => setCredit({ ...credit, providerMode: 'verified' })}
-                    className="accent-cy"
-                  />
-                  <span>
-                    <strong className="block text-ink">Bureau Gateway</strong>
-                    <span className="text-[10px] text-mute">Authorized partner API</span>
-                  </span>
-                </label>
+            {/* Provider and Consent */}
+            <div className="mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-700">Verification Gateway</span>
+                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  DEMO PROVIDER
+                </span>
               </div>
-
-              <div className="pt-2 border-t border-line/60">
-                <label className="flex items-start gap-2 text-xs text-mute cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={credit.consent}
-                    onChange={(e) => setCredit({ ...credit, consent: e.target.checked })}
-                    className="mt-0.5 accent-cy"
-                  />
-                  <span className="text-[11px] leading-relaxed">
-                    I provide explicit consent for transparent credit evaluation and understand this is an AI advisory assessment.
-                  </span>
-                </label>
-                {errors.consent && <p className="text-bad text-[11px] mt-1">{errors.consent}</p>}
-              </div>
+              <label className="flex items-start gap-2 text-xs text-slate-600 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={credit.consent}
+                  onChange={(e) => setCredit({ ...credit, consent: e.target.checked })}
+                  className="mt-0.5 accent-emerald-600"
+                />
+                <span className="text-xs leading-relaxed">
+                  I give consent for transparent credit evaluation and understand this assessment uses Explainable Machine Learning.
+                </span>
+              </label>
+              {errors.consent && <p className="text-rose-600 text-xs mt-1">{errors.consent}</p>}
             </div>
 
-            <div className="flex gap-3 mt-6">
+            <div className="flex justify-between gap-3 mt-8 pt-5 border-t border-slate-200">
               <button
                 type="button"
                 onClick={() => setStep(2)}
-                disabled={loading}
-                className="py-3 px-5 rounded-xl font-bold bg-field text-ink hover:bg-line/40 transition-colors text-sm disabled:opacity-50"
+                className="px-5 py-2.5 rounded-xl font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm"
               >
-                Back
+                ← Back
               </button>
               <button
                 type="button"
                 onClick={validateAndSubmit}
                 disabled={loading}
-                className="flex-1 py-3 rounded-xl font-bold bg-gradient-to-r from-cy to-blue-600 text-bg hover:opacity-95 transition-opacity text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+                className="px-6 py-2.5 rounded-xl font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm text-sm flex items-center gap-2 disabled:opacity-50"
               >
-                {loading ? (
-                  <>
-                    <span className="w-4 h-4 border-2 border-bg border-t-transparent rounded-full animate-spin" />
-                    Calculating Explainable Assessment...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-4 h-4" />
-                    Get Clear Decision
-                  </>
-                )}
+                {loading ? 'Evaluating Model...' : 'Calculate Eligibility Outcome →'}
               </button>
             </div>
           </div>
         )}
 
-        {/* STEP 4: Humanized Explainable Assessment Result */}
+        {/* STEP 4: Assessment & Results */}
         {step === 4 && predictionResult && (
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-xl font-bold text-ink">Your Explainable Loan Decision</h2>
-              <span className="text-xs text-cy font-medium">Step 4 of 4</span>
+            <div className="mb-6">
+              <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">
+                STEP 4 OF 4
+              </span>
+              <h2 className="text-xl font-black text-slate-900 mt-0.5">
+                Eligibility Assessment Result
+              </h2>
+              <p className="text-xs text-slate-500 mt-1">
+                Deterministic Explainable Boosting Machine (EBM) evaluation for <strong>{profile.name}</strong>.
+              </p>
             </div>
-            <p className="text-mute text-xs mb-4">
-              Here is exactly what drove our assessment for <strong>{profile.name}</strong>.
-            </p>
 
-            {/* Humanized Result Banner */}
+            {/* Outcome Card */}
             <div
-              className={`p-4 rounded-2xl border mb-5 ${
+              className={`p-5 rounded-2xl border mb-6 ${
                 predictionResult.predicted_class === 'Approved'
-                  ? 'bg-ok/10 border-ok/30'
+                  ? 'bg-emerald-50/80 border-emerald-200'
                   : predictionResult.predicted_class === 'Needs Review'
-                  ? 'bg-warn/10 border-warn/30'
-                  : 'bg-bad/10 border-bad/30'
+                  ? 'bg-amber-50/80 border-amber-200'
+                  : 'bg-rose-50/80 border-rose-200'
               }`}
             >
               <div className="flex items-center justify-between">
@@ -781,124 +776,92 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
                   <span
                     className={`text-[11px] font-extrabold uppercase tracking-wider ${
                       predictionResult.predicted_class === 'Approved'
-                        ? 'text-ok'
+                        ? 'text-emerald-700'
                         : predictionResult.predicted_class === 'Needs Review'
-                        ? 'text-warn'
-                        : 'text-bad'
+                        ? 'text-amber-700'
+                        : 'text-rose-700'
                     }`}
                   >
-                    Outcome
+                    Evaluation Verdict
                   </span>
                   <div
-                    className={`text-2xl sm:text-3xl font-black mt-0.5 ${
+                    className={`text-3xl font-black mt-1 ${
                       predictionResult.predicted_class === 'Approved'
-                        ? 'text-ok'
+                        ? 'text-emerald-700'
                         : predictionResult.predicted_class === 'Needs Review'
-                        ? 'text-warn'
-                        : 'text-bad'
+                        ? 'text-amber-700'
+                        : 'text-rose-700'
                     }`}
                   >
                     {predictionResult.predicted_class}
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-[11px] text-mute block">Approval Likelihood</span>
-                  <strong className="text-xl font-black text-ink">
+                  <span className="text-xs text-slate-500 block">Model Probability</span>
+                  <strong className="text-2xl font-black text-slate-900">
                     {predictionResult.probabilityPercentage}%
                   </strong>
                 </div>
               </div>
-
-              <div className="mt-2 pt-2 border-t border-line/40 text-xs text-slate-300 leading-relaxed">
-                {predictionResult.predicted_class === 'Approved' && (
-                  <span>🎉 <strong>Congratulations {profile.name}!</strong> Your debt-to-income balance and solid credit track record place you in our prime lending bracket.</span>
-                )}
-                {predictionResult.predicted_class === 'Needs Review' && (
-                  <span>⚠️ <strong>Notice:</strong> Your application shows promise, but higher debt obligations or borderline credit factors indicate you would benefit from loan structuring.</span>
-                )}
-                {predictionResult.predicted_class === 'Declined' && (
-                  <span>❌ <strong>Don't be discouraged {profile.name}:</strong> High financial exposure relative to income and credit history prevent approval today. Review the coaching roadmap below to build your score.</span>
-                )}
-              </div>
             </div>
 
-            {/* Meter Bar */}
+            {/* Likelihood Meter */}
             <div className="meter">
               <i style={{ width: `${predictionResult.probabilityPercentage}%` }} />
             </div>
 
-            {/* Low CIBIL Notice */}
-            {parseInt(credit.score) < 550 && (
-              <p className="text-bad text-xs font-semibold mb-3 bg-bad/10 p-2.5 rounded-xl border border-bad/20">
-                A CIBIL score below 550 triggers a policy pause across Indian lenders. Clearing old dues is the fastest way to rebound.
-              </p>
-            )}
-
-            {/* Mathematical Factor Attribution Bars */}
+            {/* Key Drivers */}
             <div className="my-6">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-mute flex items-center gap-1.5">
-                  <span>🔍</span> Key Attributes Influencing Your Score:
-                </h3>
-                <span className="text-[10px] text-dim">
-                  Left = Risk, Right = Strength
-                </span>
-              </div>
-
-              {predictionResult.all_factors && predictionResult.all_factors.length > 0 ? (
-                <div className="space-y-1">
-                  {predictionResult.all_factors.slice(0, 5).map((factor: any, i: number) => (
-                    <FactorBar key={i} factor={factor} />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-xs text-mute py-4">No detailed factors available.</div>
-              )}
-            </div>
-
-            {/* Actionable Human Financial Coaching Tips Card */}
-            <div className="p-4 rounded-xl bg-field/60 border border-line text-xs mb-5">
-              <div className="flex items-center gap-2 font-bold text-cy mb-2 text-xs">
-                <Lightbulb className="w-4 h-4 text-warn" />
-                Actionable Financial Coaching:
-              </div>
-              <ul className="text-slate-300 text-[11px] space-y-1.5 pl-4 list-disc leading-relaxed">
-                {getCoachingTips().map((tip, idx) => (
-                  <li key={idx}>{tip}</li>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-600 mb-3 flex items-center gap-1.5">
+                <span>🔍</span> Key Attributes Influencing Your Score:
+              </h3>
+              <div className="space-y-1">
+                {predictionResult.all_factors?.slice(0, 5).map((factor: any, i: number) => (
+                  <FactorBar key={i} factor={factor} />
                 ))}
-              </ul>
+              </div>
             </div>
 
-            {/* Legal Disclaimer */}
-            <p className="text-[11px] text-dim italic mb-6">
+            {/* Disclaimer */}
+            <p className="text-[11px] text-slate-400 italic mb-6">
               {predictionResult.disclaimer ||
                 'This assessment is an AI-assisted risk assessment for demonstration/research purposes and is not a guaranteed loan approval or denial.'}
             </p>
 
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex justify-between gap-3 pt-5 border-t border-slate-200">
               <button
                 type="button"
                 onClick={resetForm}
-                className="py-3 px-5 rounded-xl font-bold bg-field text-ink hover:bg-line/40 transition-colors text-xs flex items-center justify-center gap-1.5"
+                className="px-5 py-2.5 rounded-xl font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm flex items-center gap-1.5"
               >
-                <RotateCcw className="w-3.5 h-3.5" />
-                Try Another Scenario
+                <RotateCcw className="w-4 h-4" />
+                Reset & Try Another
               </button>
               {savedApplicationId && (
                 <button
                   type="button"
                   onClick={() => navigate(`/applications/${savedApplicationId}`)}
-                  className="flex-1 py-3 rounded-xl font-bold bg-gradient-to-r from-cy to-blue-600 text-bg hover:opacity-95 transition-opacity text-xs flex items-center justify-center gap-1.5"
+                  className="px-6 py-2.5 rounded-xl font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm text-sm flex items-center gap-1.5"
                 >
-                  <Eye className="w-3.5 h-3.5" />
-                  View Full Report & Audit Trail
+                  <Eye className="w-4 h-4" />
+                  View Full Record & Audit Trail
                 </button>
               )}
             </div>
           </div>
         )}
+
       </div>
+
+      {/* 4. Floating Citizen Support Button matching bottom right circle in screenshot */}
+      <button
+        onClick={() => alert('Loan Assistant Helpdesk: For support, verify your declared credit data or consult bank guidelines.')}
+        className="fixed bottom-6 right-6 w-12 h-12 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white shadow-lg flex items-center justify-center transition-all z-40 hover:scale-105"
+        title="Citizen Support"
+      >
+        <MessageSquare className="w-5 h-5" />
+      </button>
+
     </div>
   );
 };

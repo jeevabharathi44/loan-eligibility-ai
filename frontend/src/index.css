@@ -3,102 +3,67 @@
 @tailwind utilities;
 
 :root {
-  --bg: #0a0f1e;
-  --card: #0f172a;
-  --field: #1e293b;
-  --line: #334155;
-  --ink: #f1f5f9;
-  --mute: #94a3b8;
-  --dim: #64748b;
-  --cy: #22d3ee;
-  --ok: #4ade80;
-  --warn: #facc15;
-  --bad: #f87171;
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --field: #ffffff;
+  --line: #e2e8f0;
+  --ink: #0f172a;
+  --mute: #64748b;
+  --dim: #94a3b8;
+  --cy: #059669; /* Emerald Primary */
+  --blue: #2563eb; /* Royal Blue CTA */
+  --ok: #16a34a;
+  --warn: #d97706;
+  --bad: #dc2626;
 }
 
 body {
   margin: 0;
-  background: radial-gradient(circle at 25% 0, rgba(14, 165, 233, 0.14), transparent 40%),
-              radial-gradient(circle at 80% 60%, rgba(139, 92, 246, 0.1), transparent 40%),
-              var(--bg);
+  background-color: var(--bg);
   color: var(--ink);
   min-height: 100vh;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* Custom UI Elements matching original prototype */
+/* Civic/Fintech Card Style matching screenshot */
 .app-card {
-  background: rgba(15, 23, 42, 0.85);
-  border: 1px solid rgba(51, 65, 85, 0.7);
-  border-radius: 24px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
 }
 
-.pill {
+.pill-stepper {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
-  border-radius: 99px;
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: var(--dim);
-  border: 1px solid transparent;
-  transition: all 0.2s ease;
+  justify-content: center;
+  position: relative;
 }
 
-.pill b {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--line);
-  color: var(--mute);
-  display: grid;
-  place-items: center;
-  font-size: 0.75rem;
-}
-
-.pill.on {
-  background: rgba(34, 211, 238, 0.15);
-  border-color: rgba(34, 211, 238, 0.4);
-  color: var(--cy);
-}
-
-.pill.on b {
-  background: #06b6d4;
-  color: #fff;
-}
-
-.pill.done {
-  color: var(--ok);
-}
-
-.pill.done b {
-  background: #22c55e;
-  color: #fff;
-}
-
+/* Gauge Bar */
 .gbar {
   position: relative;
   height: 12px;
   border-radius: 6px;
-  background: linear-gradient(90deg, #f87171 0 27%, #fb923c 27% 42%, #facc15 42% 58%, #4ade80 58%);
+  background: linear-gradient(90deg, #f87171 0 27%, #fb923c 27% 42%, #facc15 42% 58%, #34d399 58%);
 }
 
 .gbar i {
   position: absolute;
-  top: -5px;
+  top: -4px;
   width: 4px;
-  height: 22px;
-  background: #fff;
+  height: 20px;
+  background: #0f172a;
   border-radius: 2px;
   transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 0 0 2px var(--bg);
+  box-shadow: 0 0 0 2px #ffffff;
 }
 
+/* Meter */
 .meter {
   height: 10px;
-  border-radius: 5px;
-  background: var(--line);
+  border-radius: 6px;
+  background: #e2e8f0;
   overflow: hidden;
   margin: 10px 0 18px;
 }
@@ -106,14 +71,15 @@ body {
 .meter i {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, #06b6d4, #3b82f6);
+  background: linear-gradient(90deg, #10b981, #2563eb);
   transition: width 0.4s ease-out;
 }
 
+/* Factor Contribution Bar */
 .factor-bar {
   position: relative;
   height: 8px;
-  background: var(--line);
+  background: #e2e8f0;
   border-radius: 4px;
 }
 
@@ -124,7 +90,7 @@ body {
   top: -3px;
   bottom: -3px;
   width: 2px;
-  background: var(--dim);
+  background: #94a3b8;
 }
 
 .factor-bar i {
@@ -135,37 +101,41 @@ body {
 }
 
 .factor-bar.up i {
-  background: var(--ok);
+  background: #10b981;
 }
 
 .factor-bar.dn i {
-  background: var(--bad);
+  background: #ef4444;
 }
 
+/* Consistency Check Boxes */
 .chk {
   padding: 16px;
-  border-radius: 14px;
-  border: 1px solid var(--line);
-  background: rgba(30, 41, 59, 0.4);
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
 }
 
 .chk.ok {
-  border-color: rgba(74, 222, 128, 0.4);
+  border-color: #a7f3d0;
+  background: #f0fdf4;
 }
 .chk.ok strong {
-  color: var(--ok);
+  color: #15803d;
 }
 
 .chk.mid {
-  border-color: rgba(250, 204, 21, 0.4);
+  border-color: #fde68a;
+  background: #fffbeb;
 }
 .chk.mid strong {
-  color: var(--warn);
+  color: #b45309;
 }
 
 .chk.bad {
-  border-color: rgba(248, 113, 113, 0.4);
+  border-color: #fecaca;
+  background: #fef2f2;
 }
 .chk.bad strong {
-  color: var(--bad);
+  color: #b91c1c;
 }

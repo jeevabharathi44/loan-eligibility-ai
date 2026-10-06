@@ -68,7 +68,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
 
         <button
           onClick={() => navigate('/apply')}
-          className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold bg-gradient-to-r from-cy to-blue-600 text-bg shadow-md shadow-cy/20 hover:opacity-95 transition-all text-sm shrink-0"
+          className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all text-sm shrink-0"
         >
           <PlusCircle className="w-4 h-4" />
           New Application

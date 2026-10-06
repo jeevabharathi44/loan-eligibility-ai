@@ -109,7 +109,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ navigate }) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-2 py-3 px-4 rounded-xl font-bold bg-gradient-to-r from-cy to-blue-600 text-bg hover:opacity-95 transition-opacity text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full mt-2 py-3 px-4 rounded-xl font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all text-sm flex items-center justify-center gap-2 disabled:opacity-50"
           >
             <UserPlus className="w-4 h-4" />
             {loading ? 'Creating Account...' : 'Register'}

@@ -28,7 +28,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ navigate }) => {
         <div className="mt-8 flex flex-wrap justify-center gap-4">
           <button
             onClick={() => navigate(isAuthenticated ? '/apply' : '/login')}
-            className="flex items-center gap-2 px-8 py-3.5 rounded-xl font-bold bg-gradient-to-r from-cy to-blue-600 text-bg shadow-lg shadow-cy/25 hover:opacity-95 transition-all text-sm"
+            className="flex items-center gap-2 px-8 py-3.5 rounded-xl font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/20 transition-all text-sm"
           >
             Check My Eligibility in 2 Minutes
             <ArrowRight className="w-4 h-4" />
