@@ -12,20 +12,40 @@ import { ApplicationDetailPage } from './pages/ApplicationDetailPage';
 import { AdminDashboardPage } from './pages/AdminDashboardPage';
 import { ModelPerformancePage } from './pages/ModelPerformancePage';
 
+const getCleanPath = () => {
+  if (window.location.hash && window.location.hash.startsWith('#/')) {
+    return window.location.hash.slice(1);
+  }
+  let path = window.location.pathname || '/';
+  if (path.startsWith('/loan-eligibility-ai')) {
+    path = path.replace('/loan-eligibility-ai', '') || '/';
+  }
+  return path || '/';
+};
+
 const AppRouter: React.FC = () => {
   const { isAuthenticated, isAdmin, isLoading } = useAuth();
-  const [currentPath, setCurrentPath] = useState<string>(window.location.pathname || '/');
+  const [currentPath, setCurrentPath] = useState<string>(getCleanPath());
 
   useEffect(() => {
     const handlePopState = () => {
-      setCurrentPath(window.location.pathname);
+      setCurrentPath(getCleanPath());
     };
     window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+    window.addEventListener('hashchange', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('hashchange', handlePopState);
+    };
   }, []);
 
   const navigate = (path: string) => {
-    window.history.pushState({}, '', path);
+    const isGhPages = window.location.pathname.includes('/loan-eligibility-ai');
+    if (isGhPages) {
+      window.location.hash = path;
+    } else {
+      window.history.pushState({}, '', path);
+    }
     setCurrentPath(path);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
