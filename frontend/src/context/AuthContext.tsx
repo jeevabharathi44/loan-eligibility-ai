@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '../types';
-import { apiClient } from '../services/api';
+import { apiClient, isStaticDeployment, shouldUseMock } from '../services/api';
 
 interface AuthContextType {
   user: User | null;
@@ -28,17 +28,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         setToken(savedToken);
         setUser(JSON.parse(savedUser));
-        // Verify with me endpoint
-        apiClient.get('/auth/me')
+
+        // In static deployments (e.g. GitHub Pages) or demo tokens, keep session active without network ping
+        if (isStaticDeployment() || savedToken.startsWith('mock_')) {
+          setIsLoading(false);
+          return;
+        }
+
+        // Verify with me endpoint on live backend server
+        apiClient
+          .get('/auth/me')
           .then((res) => {
             if (res.data?.data?.user) {
               setUser(res.data.data.user);
               localStorage.setItem('loan_ai_user', JSON.stringify(res.data.data.user));
             }
           })
-          .catch(() => {
-            // Token likely invalid
-            logout();
+          .catch((err) => {
+            if (err.response?.status === 401) {
+              logout();
+            }
           })
           .finally(() => {
             setIsLoading(false);
@@ -52,6 +61,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (email: string, password: string) => {
+    // If static hosting, immediately log in with realistic demo session
+    if (isStaticDeployment()) {
+      const isAdm = email.toLowerCase().includes('admin');
+      const demoUser: User = {
+        id: isAdm ? 'usr_admin_1' : 'usr_demo_1',
+        email: email || (isAdm ? 'admin@loanai.local' : 'arjun@loanai.local'),
+        name: isAdm ? 'Dr. M. Kalpana Devi' : 'Jeeva Bharathi M',
+        role: isAdm ? 'ADMIN' : 'USER',
+        createdAt: new Date().toISOString(),
+      };
+      setUser(demoUser);
+      setToken('mock_demo_jwt_token');
+      localStorage.setItem('loan_ai_token', 'mock_demo_jwt_token');
+      localStorage.setItem('loan_ai_user', JSON.stringify(demoUser));
+      return;
+    }
+
     try {
       const res = await apiClient.post('/auth/login', { email, password });
       const { user: loggedInUser, token: authToken } = res.data.data;
@@ -60,13 +86,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('loan_ai_token', authToken);
       localStorage.setItem('loan_ai_user', JSON.stringify(loggedInUser));
     } catch (err: any) {
-      if (!err.response || err.code === 'ERR_NETWORK') {
-        const role = email.includes('admin') ? 'ADMIN' : 'USER';
+      if (shouldUseMock(err)) {
+        const isAdm = email.toLowerCase().includes('admin');
         const demoUser: User = {
-          id: 'usr_demo_1',
-          email: email || 'arjun@loanai.local',
-          name: role === 'ADMIN' ? 'Dr. M. Kalpana Devi' : 'Jeeva Bharathi M',
-          role: role as 'USER' | 'ADMIN',
+          id: isAdm ? 'usr_admin_1' : 'usr_demo_1',
+          email: email || (isAdm ? 'admin@loanai.local' : 'arjun@loanai.local'),
+          name: isAdm ? 'Dr. M. Kalpana Devi' : 'Jeeva Bharathi M',
+          role: isAdm ? 'ADMIN' : 'USER',
           createdAt: new Date().toISOString(),
         };
         setUser(demoUser);
@@ -80,6 +106,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const register = async (name: string, email: string, password: string, role = 'USER') => {
+    if (isStaticDeployment()) {
+      const demoUser: User = {
+        id: 'usr_demo_reg',
+        email,
+        name: name || 'Demo Applicant',
+        role: role as 'USER' | 'ADMIN',
+        createdAt: new Date().toISOString(),
+      };
+      setUser(demoUser);
+      setToken('mock_demo_jwt_token');
+      localStorage.setItem('loan_ai_token', 'mock_demo_jwt_token');
+      localStorage.setItem('loan_ai_user', JSON.stringify(demoUser));
+      return;
+    }
+
     try {
       const res = await apiClient.post('/auth/register', { name, email, password, role });
       const { user: newUser, token: authToken } = res.data.data;
@@ -88,11 +129,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('loan_ai_token', authToken);
       localStorage.setItem('loan_ai_user', JSON.stringify(newUser));
     } catch (err: any) {
-      if (!err.response || err.code === 'ERR_NETWORK') {
+      if (shouldUseMock(err)) {
         const demoUser: User = {
           id: 'usr_demo_reg',
           email,
-          name,
+          name: name || 'Demo Applicant',
           role: role as 'USER' | 'ADMIN',
           createdAt: new Date().toISOString(),
         };

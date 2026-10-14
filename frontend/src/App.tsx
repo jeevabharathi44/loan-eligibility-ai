@@ -13,8 +13,9 @@ import { AdminDashboardPage } from './pages/AdminDashboardPage';
 import { ModelPerformancePage } from './pages/ModelPerformancePage';
 
 const getCleanPath = () => {
-  if (window.location.hash && window.location.hash.startsWith('#/')) {
-    return window.location.hash.slice(1);
+  if (window.location.hash) {
+    const hash = window.location.hash.replace(/^#\/?/, '/');
+    if (hash) return hash;
   }
   let path = window.location.pathname || '/';
   if (path.startsWith('/loan-eligibility-ai')) {
@@ -40,8 +41,13 @@ const AppRouter: React.FC = () => {
   }, []);
 
   const navigate = (path: string) => {
-    const isGhPages = window.location.pathname.includes('/loan-eligibility-ai');
-    if (isGhPages) {
+    const isStatic =
+      window.location.hostname.includes('github.io') ||
+      window.location.pathname.includes('/loan-eligibility-ai') ||
+      window.location.hostname.includes('surge.sh') ||
+      window.location.hostname.includes('netlify.app') ||
+      window.location.hostname.includes('vercel.app');
+    if (isStatic) {
       window.location.hash = path;
     } else {
       window.history.pushState({}, '', path);
