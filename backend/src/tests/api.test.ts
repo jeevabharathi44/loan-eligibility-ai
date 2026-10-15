@@ -50,8 +50,8 @@ jest.mock('../services/mlClient', () => ({
 describe('Loan Eligibility AI - Backend API Test Suite', () => {
   const testUser = {
     id: '11111111-1111-1111-1111-111111111111',
-    name: 'Arjun Sharma',
-    email: 'arjun@example.com',
+    name: 'Karthik Selvam',
+    email: 'karthik@example.com',
     role: 'USER',
     passwordHash: '',
     createdAt: new Date(),

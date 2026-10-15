@@ -46,7 +46,7 @@
 - **Technology**: React 18, TypeScript, Vite, Tailwind CSS, Lucide React icons.
 - **Key Modules**:
   - `Navbar` & `Footer`: Responsive navigation, authentication status, and branding.
-  - `ApplicationWizardPage`: 4-step wizard preserving the prototype's visual identity, 1-click sample profiles (Arjun, Meena, Rajan), and real-time underwriting ratios.
+  - `ApplicationWizardPage`: 4-step wizard preserving the prototype's visual identity, 1-click sample profiles (Karthik, Anitha, Muthu), and real-time underwriting ratios.
   - `CibilGauge`: Interactive CIBIL score gauge with colored gradient bar, marker needle, and consistency evaluation against repayment habits.
   - `FactorBar`: Positive (green) and negative (red) mathematical contribution bars with center vertical split line.
   - `DashboardPage`: Applicant metrics, portfolio breakdown, and quick actions.

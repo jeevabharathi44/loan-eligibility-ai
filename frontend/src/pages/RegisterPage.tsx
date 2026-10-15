@@ -36,8 +36,8 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ navigate }) => {
         <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-cy to-blue-600 mb-3 shadow-lg shadow-cy/25">
           <Shield className="w-6 h-6 text-bg" />
         </div>
-        <h1 className="text-2xl font-black text-ink">Create an Account</h1>
-        <p className="text-xs text-mute mt-1">Get started with AI-driven loan eligibility assessments</p>
+        <h1 className="text-2xl font-black text-ink">Join Loan Assistant</h1>
+        <p className="text-xs text-mute mt-1">Digital Personal Loan Processing, Verification & Instant Disbursement</p>
       </div>
 
       <div className="app-card p-6 sm:p-8">
@@ -58,7 +58,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ navigate }) => {
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Arjun Sharma"
+              placeholder="e.g. Karthik Selvam"
               className="w-full bg-field/60 border border-line rounded-xl px-4 py-2.5 text-sm text-ink focus:outline-none focus:border-cy"
             />
           </div>

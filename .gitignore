@@ -30,3 +30,10 @@ mysql_data/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Runtime SQLite and temporary uploads
+backend_fastapi/*.db
+backend_fastapi/*.db-journal
+backend_fastapi/uploads/*
+!backend_fastapi/uploads/.gitkeep
+

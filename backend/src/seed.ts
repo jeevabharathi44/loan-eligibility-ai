@@ -24,28 +24,28 @@ async function main() {
 
   // 2. Create Demo Users
   const user1 = await prisma.user.upsert({
-    where: { email: 'arjun@loanai.local' },
+    where: { email: 'karthik@loanai.local' },
     update: {},
     create: {
-      name: 'Arjun Sharma',
-      email: 'arjun@loanai.local',
+      name: 'Karthik Selvam',
+      email: 'karthik@loanai.local',
       passwordHash: userPassword,
       role: Role.USER,
     },
   });
 
   await prisma.user.upsert({
-    where: { email: 'meena@loanai.local' },
+    where: { email: 'anitha@loanai.local' },
     update: {},
     create: {
-      name: 'Meena Patel',
-      email: 'meena@loanai.local',
+      name: 'Anitha Murugan',
+      email: 'anitha@loanai.local',
       passwordHash: userPassword,
       role: Role.USER,
     },
   });
 
-  // 3. Create Sample Application for Arjun if not exists
+  // 3. Create Sample Application for Karthik if not exists
   const existingApp = await prisma.loanApplication.findFirst({
     where: { userId: user1.id },
   });
@@ -128,7 +128,7 @@ async function main() {
         },
       },
     });
-    console.log(`Sample application created for Arjun: ${app1.id}`);
+    console.log(`Sample application created for Karthik: ${app1.id}`);
   }
 
   console.log('--- Database Seeding Complete ---');

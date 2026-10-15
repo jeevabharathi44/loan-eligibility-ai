@@ -58,11 +58,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
       {/* Welcome header & CTA */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-ink">
-            Welcome back, <span className="text-cy">{user?.name}</span>
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900">
+            Welcome back, <span className="text-blue-600">{user?.name}</span>
           </h1>
-          <p className="text-xs sm:text-sm text-mute mt-1">
-            Real-time status of your credit profiles and explainable AI loan assessments
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Loan Assistant Hub: Track your loan applications, DigiLocker KYC verification, and disbursement transactions
           </p>
         </div>
 
@@ -71,7 +71,30 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
           className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all text-sm shrink-0"
         >
           <PlusCircle className="w-4 h-4" />
-          New Application
+          Apply for Loan
+        </button>
+      </div>
+
+      {/* Feature Announcement Bar */}
+      <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-emerald-50 via-blue-50 to-indigo-50 border border-emerald-200 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
+            LA
+          </div>
+          <div>
+            <span className="font-black text-slate-900 block">
+              Loan Assistant: End-to-End Digital Lending & Transaction Platform
+            </span>
+            <span className="text-slate-600 text-[11px]">
+              Apply with your documents, verify via DigiLocker, check Aadhaar-to-PAN face biometrics, and execute real-time loan disbursements.
+            </span>
+          </div>
+        </div>
+        <button
+          onClick={() => navigate('/apply')}
+          className="px-3.5 py-1.5 rounded-lg font-bold bg-emerald-700 hover:bg-emerald-800 text-white text-[11px] shrink-0"
+        >
+          Check Eligibility & Apply →
         </button>
       </div>
 

@@ -35,7 +35,7 @@ docker compose up --build
 ### What happens automatically:
 1. **MySQL 8.0** initializes and performs healthchecks.
 2. **ML Service** builds, installs dependencies, verifies the trained EBM model, and starts Uvicorn.
-3. **Backend** compiles TypeScript, generates the Prisma Client, pushes the database schema to MySQL, seeds demo accounts (`admin@loanai.local` and `arjun@loanai.local`), and starts Express.
+3. **Backend** compiles TypeScript, generates the Prisma Client, pushes the database schema to MySQL, seeds demo accounts (`admin@loanai.local` and `karthik@loanai.local`), and starts Express.
 4. **Frontend** builds the production React application with Vite and serves it through Nginx on port `3000`.
 
 ---
@@ -48,7 +48,7 @@ Once the containers are up:
 - **ML Service Health & Docs**: [http://localhost:8000/health](http://localhost:8000/health) and [http://localhost:8000/docs](http://localhost:8000/docs) (Swagger UI)
 
 ### Demo Accounts for Testing:
-- **Applicant Demo**: `arjun@loanai.local` / `User@12345`
+- **Applicant Demo**: `karthik@loanai.local` / `User@12345`
 - **Underwriter Admin**: `admin@loanai.local` / `Admin@12345`
 
 ---

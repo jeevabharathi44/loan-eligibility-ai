@@ -13,9 +13,12 @@ import { AdminDashboardPage } from './pages/AdminDashboardPage';
 import { ModelPerformancePage } from './pages/ModelPerformancePage';
 
 const getCleanPath = () => {
+  if (typeof window === 'undefined') return '/';
   if (window.location.hash) {
-    const hash = window.location.hash.replace(/^#\/?/, '/');
-    if (hash) return hash;
+    const raw = window.location.hash.replace(/^#\/?/, '/');
+    if (raw && raw !== '/') {
+      return raw.startsWith('/') ? raw : '/' + raw;
+    }
   }
   let path = window.location.pathname || '/';
   if (path.startsWith('/loan-eligibility-ai')) {
@@ -41,18 +44,9 @@ const AppRouter: React.FC = () => {
   }, []);
 
   const navigate = (path: string) => {
-    const isStatic =
-      window.location.hostname.includes('github.io') ||
-      window.location.pathname.includes('/loan-eligibility-ai') ||
-      window.location.hostname.includes('surge.sh') ||
-      window.location.hostname.includes('netlify.app') ||
-      window.location.hostname.includes('vercel.app');
-    if (isStatic) {
-      window.location.hash = path;
-    } else {
-      window.history.pushState({}, '', path);
-    }
-    setCurrentPath(path);
+    const target = path.startsWith('/') ? path : '/' + path;
+    window.location.hash = '#' + target;
+    setCurrentPath(target);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 

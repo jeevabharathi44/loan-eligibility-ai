@@ -1,0 +1,107 @@
+{
+  "ebm": {
+    "model_name": "Explainable Boosting Machine (EBM)",
+    "model_version": "v1.2.0-ebm",
+    "accuracy": 0.763,
+    "precision": 0.7813,
+    "recall": 0.9271,
+    "f1_score": 0.848,
+    "roc_auc": 0.7535,
+    "brier_score": 0.1666,
+    "confusion_matrix": [
+      [
+        102,
+        185
+      ],
+      [
+        52,
+        661
+      ]
+    ]
+  },
+  "baseline": {
+    "model_name": "Logistic Regression (Baseline)",
+    "accuracy": 0.746,
+    "precision": 0.7525,
+    "recall": 0.9593,
+    "f1_score": 0.8434,
+    "roc_auc": 0.6837,
+    "brier_score": 0.1833,
+    "confusion_matrix": [
+      [
+        62,
+        225
+      ],
+      [
+        29,
+        684
+      ]
+    ]
+  },
+  "feature_importances": [
+    {
+      "feature": "debt_to_income_pct",
+      "importance": 0.6414
+    },
+    {
+      "feature": "simulated_payment_history_ratio",
+      "importance": 0.2566
+    },
+    {
+      "feature": "simulated_credit_score",
+      "importance": 0.2295
+    },
+    {
+      "feature": "employment_tenure_months",
+      "importance": 0.1137
+    },
+    {
+      "feature": "loan_to_income_ratio",
+      "importance": 0.0826
+    },
+    {
+      "feature": "monthly_income",
+      "importance": 0.0786
+    },
+    {
+      "feature": "simulated_credit_utilization",
+      "importance": 0.062
+    },
+    {
+      "feature": "debt_to_income_pct & loan_to_income_ratio",
+      "importance": 0.0114
+    },
+    {
+      "feature": "monthly_income & simulated_payment_history_ratio",
+      "importance": 0.0103
+    },
+    {
+      "feature": "simulated_credit_score & loan_to_income_ratio",
+      "importance": 0.0087
+    },
+    {
+      "feature": "monthly_income & debt_to_income_pct",
+      "importance": 0.0079
+    },
+    {
+      "feature": "simulated_credit_score & debt_to_income_pct",
+      "importance": 0.0076
+    }
+  ],
+  "training_metadata": {
+    "train_samples": 4000,
+    "test_samples": 1000,
+    "features_used": [
+      "monthly_income",
+      "simulated_credit_score",
+      "debt_to_income_pct",
+      "simulated_payment_history_ratio",
+      "simulated_credit_utilization",
+      "employment_tenure_months",
+      "loan_to_income_ratio"
+    ],
+    "target": "synthetic_loan_approved",
+    "model_version": "v1.2.0-ebm",
+    "disclaimer": "Trained on synthetic loan applicant dataset with reproducible seed=42. Does not predict real-world lending performance without production bureau data."
+  }
+}

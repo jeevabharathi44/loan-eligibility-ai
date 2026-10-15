@@ -13,16 +13,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ navigate }) => {
     <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
       {/* Humanized Hero Header */}
       <div className="text-center mb-12">
-        <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-cy/10 border border-cy/25 text-cy text-xs font-semibold uppercase tracking-wider mb-4">
-          <HeartHandshake className="w-3.5 h-3.5" />
-          Fair & Human-Centered Lending Intelligence
+        <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold uppercase tracking-wider mb-4">
+          <HeartHandshake className="w-3.5 h-3.5 text-emerald-600" />
+          Loan Assistant — End-to-End Digital Lending & Disbursement
         </div>
-        <h1 className="text-4xl sm:text-6xl font-black tracking-tight mb-4 leading-tight">
-          Clear, Transparent Loan Decisions <br />
-          <span className="text-cy">You Can Actually Understand</span>
+        <h1 className="text-4xl sm:text-6xl font-black tracking-tight mb-4 leading-tight text-slate-900">
+          Transparent Loan Approvals <br />
+          <span className="text-blue-600">& Instant Digital Disbursement</span>
         </h1>
-        <p className="text-mute text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-          Tired of mysterious loan rejections with zero explanation? We use Microsoft InterpretML's Glassbox AI to show you the exact math behind your score — so you're always in control of your financial future.
+        <p className="text-slate-600 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+          Not just eligibility checks — Loan Assistant guides you through user document upload, automated DigiLocker verification, tri-biometric face matching, transparent EBM AI scoring, and complete digital loan disbursement.
         </p>
 
         <div className="mt-8 flex flex-wrap justify-center gap-4">
@@ -30,14 +30,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ navigate }) => {
             onClick={() => navigate(isAuthenticated ? '/apply' : '/login')}
             className="flex items-center gap-2 px-8 py-3.5 rounded-xl font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/20 transition-all text-sm"
           >
-            Check My Eligibility in 2 Minutes
+            Apply & Check Loan Eligibility
             <ArrowRight className="w-4 h-4" />
           </button>
           <button
             onClick={() => navigate('/model-metrics')}
-            className="flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold bg-field border border-line text-ink hover:border-cy/50 transition-all text-sm"
+            className="flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold bg-white border border-slate-300 text-slate-800 hover:border-blue-400 transition-all text-sm shadow-2xs"
           >
-            <BarChart2 className="w-4 h-4 text-cy" />
+            <BarChart2 className="w-4 h-4 text-blue-600" />
             Inspect Glassbox Metrics
           </button>
         </div>
@@ -111,10 +111,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ navigate }) => {
           </div>
 
           <div className="p-4 rounded-xl bg-field/60 border border-line">
-            <span className="text-xs font-mono font-bold text-cy">04. CLEAR DECISION</span>
-            <h4 className="font-bold text-sm mt-1 mb-1.5">Transparent Results</h4>
+            <span className="text-xs font-mono font-bold text-cy">04. SANCTION & DISBURSEMENT</span>
+            <h4 className="font-bold text-sm mt-1 mb-1.5">Instant Transfer</h4>
             <p className="text-xs text-mute leading-relaxed">
-              Receive your explainable assessment, positive/negative drivers, and personalized coaching tips.
+              Receive instant preliminary approval, sign digital agreement, and execute automated loan disbursement with an official UTR ledger receipt.
             </p>
           </div>
         </div>

@@ -13,8 +13,8 @@ Creates a new applicant or admin account.
 **Request Body:**
 ```json
 {
-  "name": "Arjun Sharma",
-  "email": "arjun@loanai.local",
+  "name": "Karthik Selvam",
+  "email": "karthik@loanai.local",
   "password": "User@12345",
   "role": "USER"
 }
@@ -28,8 +28,8 @@ Creates a new applicant or admin account.
   "data": {
     "user": {
       "id": "e43b1234-abcd-5678-ef01-123456789abc",
-      "name": "Arjun Sharma",
-      "email": "arjun@loanai.local",
+      "name": "Karthik Selvam",
+      "email": "karthik@loanai.local",
       "role": "USER",
       "createdAt": "2026-10-06T12:00:00.000Z"
     },
@@ -44,7 +44,7 @@ Authenticates user credentials and returns a signed JWT.
 **Request Body:**
 ```json
 {
-  "email": "arjun@loanai.local",
+  "email": "karthik@loanai.local",
   "password": "User@12345"
 }
 ```
@@ -57,8 +57,8 @@ Authenticates user credentials and returns a signed JWT.
   "data": {
     "user": {
       "id": "e43b1234-abcd-5678-ef01-123456789abc",
-      "name": "Arjun Sharma",
-      "email": "arjun@loanai.local",
+      "name": "Karthik Selvam",
+      "email": "karthik@loanai.local",
       "role": "USER"
     },
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."

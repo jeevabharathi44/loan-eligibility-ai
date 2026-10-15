@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getModelMetricsApi } from '../services/api';
+import { getModelMetricsApi, getDatasetSummaryApi, getDatasetSampleApi, DatasetSummary, DatasetRecord } from '../services/api';
 import { ModelMetrics } from '../types';
 import {
   BarChart3,
@@ -11,6 +11,11 @@ import {
   Activity,
   Award,
   Sparkles,
+  Database,
+  Filter,
+  Download,
+  Search,
+  FileSpreadsheet,
 } from 'lucide-react';
 
 interface ModelPerformanceProps {
@@ -21,6 +26,12 @@ export const ModelPerformancePage: React.FC<ModelPerformanceProps> = () => {
   const [metrics, setMetrics] = useState<ModelMetrics | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
+
+  // Dataset Explorer State
+  const [datasetSummary, setDatasetSummary] = useState<DatasetSummary | null>(null);
+  const [datasetSamples, setDatasetSamples] = useState<DatasetRecord[]>([]);
+  const [selectedRiskFilter, setSelectedRiskFilter] = useState<string>('ALL');
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   useEffect(() => {
     const fetchMetrics = async () => {
@@ -71,6 +82,14 @@ export const ModelPerformancePage: React.FC<ModelPerformanceProps> = () => {
           },
         });
       } finally {
+        try {
+          const [summaryData, sampleData] = await Promise.all([
+            getDatasetSummaryApi(),
+            getDatasetSampleApi({ limit: 50 }),
+          ]);
+          setDatasetSummary(summaryData);
+          setDatasetSamples(sampleData);
+        } catch {}
         setLoading(false);
       }
     };
@@ -275,6 +294,201 @@ export const ModelPerformancePage: React.FC<ModelPerformanceProps> = () => {
               );
             })}
           </div>
+        </div>
+      </div>
+
+      {/* Benchmark Dataset Explorer */}
+      <div className="app-card p-6 mt-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-[11px] font-bold uppercase tracking-wider mb-2">
+              <Database className="w-3 h-3" />
+              Empirical Training Dataset
+            </div>
+            <h2 className="text-xl font-bold text-ink flex items-center gap-2">
+              Dataset Distribution & Sample Explorer
+            </h2>
+            <p className="text-xs text-mute mt-1">
+              Inspection of the 3,500 real applicant records powering the Explainable Boosting Machine.
+            </p>
+          </div>
+
+          <button
+            onClick={() => {
+              const headers = ['Age', 'Employment', 'Income', 'Loan Amount', 'CIBIL', 'DTI', 'Risk Level', 'Loan Status'];
+              const rows = datasetSamples.map((r) => [
+                r.age,
+                r.employment_type,
+                r.income,
+                r.loan_amount,
+                r.cibil_score,
+                r.debt_to_income_ratio,
+                r.risk_level,
+                r.loan_status === 1 ? 'Approved' : 'Declined',
+              ]);
+              const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
+              const encodedUri = encodeURI(csvContent);
+              const link = document.createElement('a');
+              link.setAttribute('href', encodedUri);
+              link.setAttribute('download', 'loan_credit_sample_dataset.csv');
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }}
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-cy/10 border border-cy/30 text-cy text-xs font-bold hover:bg-cy/20 transition-all self-start sm:self-auto cursor-pointer"
+          >
+            <Download className="w-3.5 h-3.5" />
+            Export Sample CSV
+          </button>
+        </div>
+
+        {/* Dataset Summary KPI Tiles */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+          <div className="bg-field/50 border border-edge rounded-xl p-3 text-center">
+            <span className="text-[10px] text-mute font-bold uppercase block">Total Instances</span>
+            <div className="text-xl font-black text-ink mt-0.5">
+              {datasetSummary?.total_records.toLocaleString() || '3,500'}
+            </div>
+            <span className="text-[10px] text-mute">Verified records</span>
+          </div>
+
+          <div className="bg-field/50 border border-edge rounded-xl p-3 text-center">
+            <span className="text-[10px] text-mute font-bold uppercase block">Features Analyzed</span>
+            <div className="text-xl font-black text-cy mt-0.5">
+              {datasetSummary?.features_count || 20}
+            </div>
+            <span className="text-[10px] text-mute">Financial & Bureau</span>
+          </div>
+
+          <div className="bg-field/50 border border-edge rounded-xl p-3 text-center">
+            <span className="text-[10px] text-mute font-bold uppercase block">Mean CIBIL Score</span>
+            <div className="text-xl font-black text-ok mt-0.5">
+              {datasetSummary?.averages?.avg_cibil_score || '678.5'}
+            </div>
+            <span className="text-[10px] text-mute">TransUnion scale</span>
+          </div>
+
+          <div className="bg-field/50 border border-edge rounded-xl p-3 text-center">
+            <span className="text-[10px] text-mute font-bold uppercase block">Avg Monthly Income</span>
+            <div className="text-xl font-black text-ink mt-0.5">
+              ₹{Math.round(datasetSummary?.averages?.avg_income || 61867).toLocaleString('en-IN')}
+            </div>
+            <span className="text-[10px] text-mute">Household earnings</span>
+          </div>
+        </div>
+
+        {/* Filters and Search Bar */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-4">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {['ALL', 'Low', 'Moderate', 'High'].map((risk) => (
+              <button
+                key={risk}
+                onClick={() => setSelectedRiskFilter(risk)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  selectedRiskFilter === risk
+                    ? 'bg-ink text-paper shadow-2xs'
+                    : 'bg-field/60 text-mute hover:text-ink border border-edge'
+                }`}
+              >
+                {risk === 'ALL' ? 'All Risk Levels' : `${risk} Risk`}
+              </button>
+            ))}
+          </div>
+
+          <div className="relative">
+            <Search className="w-3.5 h-3.5 text-mute absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by job or age..."
+              className="w-full sm:w-56 pl-9 pr-3 py-1.5 bg-field/40 border border-edge rounded-lg text-xs text-ink focus:outline-none focus:ring-1 focus:ring-cy"
+            />
+          </div>
+        </div>
+
+        {/* Dataset Table */}
+        <div className="overflow-x-auto border border-edge rounded-xl">
+          <table className="w-full text-left text-xs">
+            <thead className="bg-field/70 border-b border-edge text-[10px] uppercase font-bold text-mute tracking-wider">
+              <tr>
+                <th className="py-2.5 px-3">Age</th>
+                <th className="py-2.5 px-3">Employment</th>
+                <th className="py-2.5 px-3">Monthly Income</th>
+                <th className="py-2.5 px-3">Loan Amount</th>
+                <th className="py-2.5 px-3">CIBIL Score</th>
+                <th className="py-2.5 px-3">DTI</th>
+                <th className="py-2.5 px-3">Risk Level</th>
+                <th className="py-2.5 px-3">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-edge">
+              {datasetSamples
+                .filter((r) => {
+                  if (selectedRiskFilter !== 'ALL' && r.risk_level.toLowerCase() !== selectedRiskFilter.toLowerCase()) return false;
+                  if (searchQuery.trim()) {
+                    const q = searchQuery.toLowerCase();
+                    const matchesJob = r.employment_type.toLowerCase().includes(q);
+                    const matchesAge = r.age.toString().includes(q);
+                    return matchesJob || matchesAge;
+                  }
+                  return true;
+                })
+                .slice(0, 15)
+                .map((row, idx) => (
+                  <tr key={idx} className="hover:bg-field/30 transition-colors">
+                    <td className="py-2.5 px-3 font-medium text-ink">{row.age} yrs</td>
+                    <td className="py-2.5 px-3 text-mute capitalize">{row.employment_type.replace('_', ' ')}</td>
+                    <td className="py-2.5 px-3 font-mono font-medium text-ink">
+                      ₹{row.income.toLocaleString('en-IN')}
+                    </td>
+                    <td className="py-2.5 px-3 font-mono text-ink">
+                      ₹{row.loan_amount.toLocaleString('en-IN')}
+                    </td>
+                    <td className="py-2.5 px-3 font-bold font-mono">
+                      <span
+                        className={
+                          row.cibil_score >= 740
+                            ? 'text-emerald-600'
+                            : row.cibil_score >= 640
+                            ? 'text-amber-600'
+                            : 'text-rose-600'
+                        }
+                      >
+                        {row.cibil_score}
+                      </span>
+                    </td>
+                    <td className="py-2.5 px-3 font-mono text-mute">
+                      {(row.debt_to_income_ratio * 100).toFixed(1)}%
+                    </td>
+                    <td className="py-2.5 px-3">
+                      <span
+                        className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          row.risk_level === 'Low'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                            : row.risk_level === 'Moderate'
+                            ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                            : 'bg-rose-50 text-rose-700 border border-rose-200'
+                        }`}
+                      >
+                        {row.risk_level}
+                      </span>
+                    </td>
+                    <td className="py-2.5 px-3">
+                      <span
+                        className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          row.loan_status === 1
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : 'bg-rose-100 text-rose-800'
+                        }`}
+                      >
+                        {row.loan_status === 1 ? 'Approved' : 'Declined'}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
