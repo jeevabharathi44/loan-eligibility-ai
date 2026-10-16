@@ -109,11 +109,71 @@ async def upload_document(
     extracted_fields = proc_res.get("extractedFields", [])
     fields_dict = {f["field_name"]: f["normalized_value"] or f["extracted_value"] for f in extracted_fields}
     detected_type = target_type
+    classified_type = proc_res.get("docType", "OTHER")
     ocr_status = proc_res.get("ocrStatus", "EXTRACTED")
+
+    # Document Type Classification Check
+    type_warning = None
+    if target_type == "AADHAAR" and classified_type == "PAN":
+        type_warning = "Document Type Warning: Uploaded document appears to be a PAN Card instead of an Aadhaar Card. Please ensure you upload the correct document."
+    elif target_type == "PAN" and classified_type == "AADHAAR":
+        type_warning = "Document Type Warning: Uploaded document appears to be an Aadhaar Card instead of a PAN Card. Please ensure you upload the correct document."
+    elif classified_type == "OTHER" and target_type in ["AADHAAR", "PAN"]:
+        type_warning = f"Document Notice: Cannot confirm official {target_type} security markers. Please ensure the scan is clear and unobscured."
+
+    # Cross-match with DigiLocker database for this application
+    from ..models import DigiLockerRecord
+    dl_records = db.query(DigiLockerRecord).filter(DigiLockerRecord.application_id == app.id).all()
+    digilocker_match = {
+        "verified": False,
+        "status": "NOT_CHECKED",
+        "message": "DigiLocker records not retrieved yet for this application."
+    }
+    for dlr in dl_records:
+        if dlr.document_type == target_type and dlr.raw_metadata:
+            try:
+                dl_fields = json.loads(dlr.raw_metadata)
+                if target_type == "PAN":
+                    dl_pan = (dl_fields.get("panNumber") or "").strip().upper()
+                    ext_pan = (fields_dict.get("pan_number") or "").strip().upper()
+                    if dl_pan and ext_pan and dl_pan == ext_pan:
+                        digilocker_match = {
+                            "verified": True,
+                            "status": "MATCHED",
+                            "message": f"DigiLocker Match Verified: Uploaded PAN ({ext_pan}) matches DigiLocker record ({dl_pan})."
+                        }
+                    elif dl_pan and ext_pan:
+                        digilocker_match = {
+                            "verified": False,
+                            "status": "MISMATCH",
+                            "message": f"DigiLocker Mismatch: Uploaded PAN ({ext_pan}) does not match DigiLocker record ({dl_pan})."
+                        }
+                elif target_type == "AADHAAR":
+                    dl_aadh = dl_fields.get("maskedAadhaar") or dl_fields.get("fullAadhaar", "")
+                    ext_aadh = fields_dict.get("aadhaar_number") or ""
+                    dl_digits = "".join(filter(str.isdigit, dl_aadh))[-4:]
+                    ext_digits = "".join(filter(str.isdigit, ext_aadh))[-4:]
+                    if dl_digits and ext_digits and dl_digits == ext_digits:
+                        digilocker_match = {
+                            "verified": True,
+                            "status": "MATCHED",
+                            "message": f"DigiLocker Match Verified: Uploaded Aadhaar ending in ...{ext_digits} matches DigiLocker record."
+                        }
+                    elif dl_digits and ext_digits:
+                        digilocker_match = {
+                            "verified": False,
+                            "status": "MISMATCH",
+                            "message": f"DigiLocker Mismatch: Uploaded Aadhaar (...{ext_digits}) does not match DigiLocker record (...{dl_digits})."
+                        }
+            except Exception:
+                pass
+
     # Separate OCR extraction status from document verification status
     doc_verif_status = "PENDING_VERIFICATION"
     if ocr_status == "FAILED":
         doc_verif_status = "FAILED"
+    elif digilocker_match.get("verified"):
+        doc_verif_status = "VERIFIED_WITH_DIGILOCKER"
 
     # Save Document record
     doc = Document(
@@ -129,8 +189,11 @@ async def upload_document(
             "size": len(contents),
             "originalName": filename,
             "ocrStatus": ocr_status,
+            "classifiedType": classified_type,
             "classificationConfidence": proc_res.get("classificationConfidence"),
-            "imageQuality": proc_res.get("imageQuality")
+            "imageQuality": proc_res.get("imageQuality"),
+            "typeWarning": type_warning,
+            "digilockerMatch": digilocker_match
         })
     )
     db.add(doc)
@@ -141,7 +204,7 @@ async def upload_document(
         user_id=current_user.id,
         application_id=app.id,
         action="DOCUMENT_UPLOADED",
-        details=f"Uploaded {detected_type} ({filename}). OCR: {ocr_status}. Quality: {quality_desc}. Verification: {doc_verif_status}."
+        details=f"Uploaded {detected_type} ({filename}). Classified: {classified_type}. OCR: {ocr_status}. Quality: {quality_desc}. DigiLocker: {digilocker_match['status']}."
     )
     db.add(audit)
     db.commit()
@@ -151,8 +214,11 @@ async def upload_document(
         "message": f"Document '{filename}' uploaded and processed via OCR successfully.",
         "documentId": doc.id,
         "docType": doc.doc_type,
+        "classifiedType": classified_type,
+        "typeWarning": type_warning,
         "ocrStatus": ocr_status,
         "verificationStatus": doc_verif_status,
+        "digilockerMatch": digilocker_match,
         "classificationConfidence": proc_res.get("classificationConfidence"),
         "imageQuality": proc_res.get("imageQuality"),
         "extractedFields": extracted_fields

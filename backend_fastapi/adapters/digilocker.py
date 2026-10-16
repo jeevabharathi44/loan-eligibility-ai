@@ -60,8 +60,59 @@ class DemoDigiLockerProvider(IDigiLockerProvider):
             "is_demo": True
         }
 
-    async def fetch_issued_documents(self, token: str, application_id: str) -> List[Dict[str, Any]]:
-        # Returns standard synthetic personal loan documents: Aadhaar and PAN Card
+    SAMPLE_PROFILES = {
+        "APPROVED": {
+            "name": "Jeeva Bharathi M",
+            "pan": "DELPJ9476P",
+            "maskedAadhaar": "XXXXXXXX2450",
+            "fullAadhaar": "2235 1313 2450",
+            "dob": "2006-02-25",
+            "gender": "MALE",
+            "address": "4/122 South Street, Salem, Tamil Nadu - 636001",
+            "status": "ISSUER_VERIFIED",
+            "cibilScore": 785,
+            "employmentType": "salaried",
+            "monthlyIncome": 85000,
+            "loanAmount": 500000,
+            "loanTenure": 36,
+            "profileLabel": "Loan Approved Profile (Prime Credit, Clean KYC)"
+        },
+        "NEED_VERIFICATION": {
+            "name": "Jeeva B",
+            "pan": "DELPJ9476P",
+            "maskedAadhaar": "XXXXXXXX8901",
+            "fullAadhaar": "4567 8901 2345",
+            "dob": "2006-02-25",
+            "gender": "MALE",
+            "address": "7/88 West Cross, Coimbatore, Tamil Nadu - 641001",
+            "status": "FLAGGED_FOR_REVIEW",
+            "cibilScore": 662,
+            "employmentType": "self_employed",
+            "monthlyIncome": 42000,
+            "loanAmount": 350000,
+            "loanTenure": 24,
+            "profileLabel": "Need Verification Profile (Minor Name Variance, Borderline CIBIL)"
+        },
+        "REJECTED": {
+            "name": "Karthik Raman",
+            "pan": "XYZKL9999P",
+            "maskedAadhaar": "XXXXXXXX9999",
+            "fullAadhaar": "9876 5432 1098",
+            "dob": "2004-11-10",
+            "gender": "MALE",
+            "address": "12/5 Old Road, Madurai, Tamil Nadu - 625001",
+            "status": "MISMATCH_DETECTED",
+            "cibilScore": 535,
+            "employmentType": "not_employed",
+            "monthlyIncome": 18000,
+            "loanAmount": 700000,
+            "loanTenure": 48,
+            "profileLabel": "Loan Rejected Profile (High DTI, Subprime Bureau, Mismatch)"
+        }
+    }
+
+    async def fetch_issued_documents(self, token: str, application_id: str, profile_key: str = "APPROVED") -> List[Dict[str, Any]]:
+        profile = self.SAMPLE_PROFILES.get(profile_key.upper(), self.SAMPLE_PROFILES["APPROVED"])
         return [
             {
                 "docId": f"DOC-DL-PAN-{uuid.uuid4().hex[:6].upper()}",
@@ -71,11 +122,11 @@ class DemoDigiLockerProvider(IDigiLockerProvider):
                 "verificationStatus": "DEMO_UNVERIFIED",
                 "labelTag": "DEMO — NOT OFFICIALLY VERIFIED",
                 "fields": {
-                    "panNumber": "ABCDE1234F",
-                    "fullName": "Karthik Selvam",
-                    "dateOfBirth": "1994-05-14",
-                    "fatherName": "Selvam Palanisamy",
-                    "status": "Active / Validated in NSDL Registry (Simulated)"
+                    "panNumber": profile["pan"],
+                    "fullName": profile["name"],
+                    "dateOfBirth": profile["dob"],
+                    "fatherName": "Mahalingam",
+                    "status": "Active / Validated in Income Tax NSDL Registry (Simulated)"
                 }
             },
             {
@@ -86,11 +137,12 @@ class DemoDigiLockerProvider(IDigiLockerProvider):
                 "verificationStatus": "DEMO_UNVERIFIED",
                 "labelTag": "DEMO — NOT OFFICIALLY VERIFIED",
                 "fields": {
-                    "maskedAadhaar": "XXXXXXXX8912",
-                    "fullName": "Karthik Selvam",
-                    "dateOfBirth": "1994-05-14",
-                    "gender": "MALE",
-                    "address": "Plot 12, 4th Main Road, Anna Nagar, Chennai, Tamil Nadu - 600040",
+                    "maskedAadhaar": profile["maskedAadhaar"],
+                    "fullAadhaar": profile["fullAadhaar"],
+                    "fullName": profile["name"],
+                    "dateOfBirth": profile["dob"],
+                    "gender": profile["gender"],
+                    "address": profile["address"],
                     "xmlSignature": "VALID_SIMULATED_DIGITAL_SIGNATURE"
                 }
             }

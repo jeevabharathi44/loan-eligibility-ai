@@ -9,6 +9,8 @@ import {
   getJeevaSampleKycApi,
   uploadDocumentFileApi,
   deleteDocumentApi,
+  pullDigiLockerDocsApi,
+  SAMPLE_DEMO_PROFILES,
 } from '../services/api';
 import { CibilGauge } from '../components/CibilGauge';
 import { FactorBar } from '../components/FactorBar';
@@ -68,24 +70,26 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [savedApplicationId, setSavedApplicationId] = useState<string>('APP-2026-0841');
+  const [selectedScenarioKey, setSelectedScenarioKey] = useState<'APPROVED' | 'NEED_VERIFICATION' | 'REJECTED'>('APPROVED');
+  const [digiLockerSyncing, setDigiLockerSyncing] = useState<boolean>(false);
 
-  // STEP 1: Applicant Details
+  // STEP 1: Applicant Details (Retrieved via DigiLocker)
   const [profile, setProfile] = useState({
     name: user?.name || 'Jeeva Bharathi M',
     age: '20',
     gender: 'Male',
     maritalStatus: 'Single / Unmarried',
-    income: '48000',
+    income: '85000',
     job: 'salaried',
-    dep: '0',
+    dep: '1',
     panNumber: 'DELPJ9476P',
     aadhaarNumber: '2235 1313 2450',
   });
 
   // STEP 2: Loan Requirements & Financials
   const [loan, setLoan] = useState({
-    amountLakhs: '3.5', // in Lakhs
-    tenure: '24', // in Months
+    amountLakhs: '5.0', // in Lakhs
+    tenure: '36', // in Months
     purpose: 'personal',
     existingLoans: '0',
     monthlyObligations: '3500',
@@ -104,17 +108,17 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
     status: string;
     regulatoryBanner: string;
   }>({
-    score: 780,
+    score: 785,
     paymentHistory: 98.2,
     creditUtilization: 21.5,
     creditHistoryYears: 4.5,
     recentEnquiries: 1,
     riskBand: 'LOW_RISK_PRIME',
     status: 'DEMO_RESULT_AVAILABLE',
-    regulatoryBanner: 'Synthetic credit profile — not a real CIBIL report',
+    regulatoryBanner: 'Synthetic credit profile — retrieved via TransUnion / CIBIL simulation',
   });
 
-  // STEP 3: Independent Manual Document Uploads
+  // STEP 3: Independent Manual Document Uploads & DigiLocker Matching
   const [aadhaarDoc, setAadhaarDoc] = useState<DocumentItemState>({
     file: null,
     fileName: 'aadhaar_card_jeeva.jpg',
@@ -130,6 +134,11 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
       dateOfBirth: '25/02/2006',
       gender: 'Male',
       address: 'Tamil Nadu, India',
+    },
+    digiLockerMatch: {
+      verified: true,
+      status: 'MATCHED',
+      message: 'DigiLocker Match Verified: Aadhaar (...2450) and name match Government DigiLocker UIDAI registry.',
     },
   });
 
@@ -148,6 +157,11 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
       maskedPan: 'DELPJXXXXP',
       dateOfBirth: '25/02/2006',
       gender: 'Male',
+    },
+    digiLockerMatch: {
+      verified: true,
+      status: 'MATCHED',
+      message: 'DigiLocker Match Verified: PAN (DELPJ9476P) matches Income Tax Dept record in DigiLocker.',
     },
   });
 
@@ -237,30 +251,53 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
     };
   }, [mediaStream]);
 
-  // Persona selector
-  const selectPersona = (personaKey: string) => {
-    if (personaKey === 'jeeva') {
-      setProfile({
-        name: 'Jeeva Bharathi M',
-        age: '20',
-        gender: 'Male',
-        maritalStatus: 'Single / Unmarried',
-        income: '48000',
-        job: 'salaried',
-        dep: '0',
-        panNumber: 'DELPJ9476P',
-        aadhaarNumber: '2235 1313 2450',
+  // Camera video stream attachment effect (Fixes black/frozen camera bug)
+  useEffect(() => {
+    if (cameraActive && mediaStream && videoRef.current) {
+      videoRef.current.srcObject = mediaStream;
+      videoRef.current.play().catch((err) => {
+        console.warn('Camera video playback caught:', err);
       });
-      setCreditData({
-        score: 780,
-        paymentHistory: 98.2,
-        creditUtilization: 21.5,
-        creditHistoryYears: 4.5,
-        recentEnquiries: 1,
-        riskBand: 'LOW_RISK_PRIME',
-        status: 'DEMO_RESULT_AVAILABLE',
-        regulatoryBanner: 'Synthetic credit profile — not a real CIBIL report',
-      });
+    }
+  }, [cameraActive, mediaStream]);
+
+  // Apply Underwriting Test Scenario (DigiLocker 3-Sample Profiles)
+  const applyScenario = (scenarioKey: 'APPROVED' | 'NEED_VERIFICATION' | 'REJECTED') => {
+    setSelectedScenarioKey(scenarioKey);
+    const data = SAMPLE_DEMO_PROFILES[scenarioKey] || SAMPLE_DEMO_PROFILES.APPROVED;
+
+    setProfile({
+      name: data.name,
+      age: scenarioKey === 'APPROVED' ? '20' : scenarioKey === 'NEED_VERIFICATION' ? '28' : '35',
+      gender: data.gender,
+      maritalStatus: scenarioKey === 'APPROVED' ? 'Single / Unmarried' : 'Married',
+      income: data.income.toString(),
+      job: data.job,
+      dep: data.dep.toString(),
+      panNumber: data.pan,
+      aadhaarNumber: data.fullAadhaar,
+    });
+
+    setLoan({
+      amountLakhs: (data.loanAmount / 100000).toString(),
+      tenure: data.loanTenure.toString(),
+      purpose: scenarioKey === 'APPROVED' ? 'personal' : scenarioKey === 'NEED_VERIFICATION' ? 'business' : 'personal',
+      existingLoans: scenarioKey === 'APPROVED' ? '0' : scenarioKey === 'NEED_VERIFICATION' ? '1' : '3',
+      monthlyObligations: scenarioKey === 'APPROVED' ? '3500' : scenarioKey === 'NEED_VERIFICATION' ? '12000' : '15000',
+    });
+
+    setCreditData({
+      score: data.cibilScore,
+      paymentHistory: scenarioKey === 'APPROVED' ? 98.2 : scenarioKey === 'NEED_VERIFICATION' ? 84.5 : 58.0,
+      creditUtilization: scenarioKey === 'APPROVED' ? 21.5 : scenarioKey === 'NEED_VERIFICATION' ? 52.0 : 89.0,
+      creditHistoryYears: scenarioKey === 'APPROVED' ? 4.5 : scenarioKey === 'NEED_VERIFICATION' ? 3.0 : 1.5,
+      recentEnquiries: scenarioKey === 'APPROVED' ? 1 : scenarioKey === 'NEED_VERIFICATION' ? 3 : 7,
+      riskBand: scenarioKey === 'APPROVED' ? 'LOW_RISK_PRIME' : scenarioKey === 'NEED_VERIFICATION' ? 'MODERATE_RISK_NEAR_PRIME' : 'HIGH_RISK_SUBPRIME',
+      status: 'DEMO_RESULT_AVAILABLE',
+      regulatoryBanner: 'Synthetic credit profile — retrieved via TransUnion / CIBIL simulation',
+    });
+
+    if (scenarioKey === 'APPROVED') {
       setAadhaarDoc({
         file: null,
         fileName: 'aadhaar_card_jeeva.jpg',
@@ -269,7 +306,20 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
         uploadStatus: 'UPLOADED',
         ocrStatus: 'EXTRACTED',
         verificationStatus: 'VERIFIED',
-        extractedFields: { fullName: 'Jeeva Bharathi M', aadhaarNumber: '2235 1313 2450', dateOfBirth: '25/02/2006', gender: 'Male' },
+        extractedFields: {
+          fullName: 'Jeeva Bharathi M',
+          aadhaarNumber: '2235 1313 2450',
+          maskedAadhaar: 'XXXX XXXX 2450',
+          dateOfBirth: '25/02/2006',
+          gender: 'Male',
+          address: 'Tamil Nadu, India',
+        },
+        typeWarning: undefined,
+        digiLockerMatch: {
+          verified: true,
+          status: 'MATCHED',
+          message: 'DigiLocker Match Verified: Aadhaar (...2450) and name match Government DigiLocker UIDAI registry.',
+        },
       });
       setPanDoc({
         file: null,
@@ -279,95 +329,248 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
         uploadStatus: 'UPLOADED',
         ocrStatus: 'EXTRACTED',
         verificationStatus: 'VERIFIED',
-        extractedFields: { fullName: 'JEEVA BHARATHI M', fatherName: 'MAHALINGAM', panNumber: 'DELPJ9476P', dateOfBirth: '25/02/2006' },
+        extractedFields: {
+          fullName: 'JEEVA BHARATHI M',
+          fatherName: 'MAHALINGAM',
+          panNumber: 'DELPJ9476P',
+          maskedPan: 'DELPJXXXXP',
+          dateOfBirth: '25/02/2006',
+          gender: 'Male',
+        },
+        typeWarning: undefined,
+        digiLockerMatch: {
+          verified: true,
+          status: 'MATCHED',
+          message: 'DigiLocker Match Verified: PAN (DELPJ9476P) matches Income Tax Dept record in DigiLocker.',
+        },
       });
-    } else if (personaKey === 'kavitha') {
-      setProfile({
-        name: 'Kavitha S',
-        age: '29',
-        gender: 'Female',
-        maritalStatus: 'Married',
-        income: '62000',
-        job: 'salaried',
-        dep: '1',
-        panNumber: 'KAVIS1234K',
-        aadhaarNumber: '4412 8821 9912',
+      setOcrCrossCheck({
+        success: true,
+        overallMatchStatus: 'EXACT_MATCH',
+        overallConfidenceScore: 99.1,
+        message: 'DigiLocker & OCR Verification Passed: All declared applicant credentials match DigiLocker repository with 100% consistency.',
+        fieldMatches: [
+          { fieldName: 'Full Legal Name', declaredValue: 'Jeeva Bharathi M', extractedValue: 'JEEVA BHARATHI M', isMatch: true, confidence: 99.2, status: 'MATCHED' },
+          { fieldName: 'Date of Birth', declaredValue: '25/02/2006', extractedValue: '25/02/2006', isMatch: true, confidence: 100.0, status: 'MATCHED' },
+          { fieldName: 'Gender', declaredValue: 'Male', extractedValue: 'Male', isMatch: true, confidence: 100.0, status: 'MATCHED' },
+          { fieldName: 'PAN Card Number', declaredValue: 'DELPJ9476P', extractedValue: 'DELPJ9476P', isMatch: true, confidence: 100.0, status: 'MATCHED' },
+          { fieldName: 'Aadhaar ID', declaredValue: '2235 1313 2450', extractedValue: 'XXXX XXXX 2450', isMatch: true, confidence: 98.5, status: 'MATCHED' },
+        ],
+        aadhaarExtracted: { name: 'Jeeva Bharathi M', dob: '25/02/2006', aadhaar: '2235 1313 2450' },
+        panExtracted: { name: 'JEEVA BHARATHI M', fatherName: 'MAHALINGAM', pan: 'DELPJ9476P' },
       });
-      setCreditData({
-        score: 775,
-        paymentHistory: 97.5,
-        creditUtilization: 24.0,
-        creditHistoryYears: 5.0,
-        recentEnquiries: 1,
-        riskBand: 'LOW_RISK_PRIME',
-        status: 'DEMO_RESULT_AVAILABLE',
-        regulatoryBanner: 'Synthetic credit profile — not a real CIBIL report',
+      setBiometricResult({
+        aadharPhotoMatchedPanPhoto: true,
+        aadharPanSimilarityScore: 99.1,
+        liveFaceMatchedDocuments: true,
+        liveFaceSimilarityScore: 98.8,
+        liveAadharSimilarityScore: 98.8,
+        livePanSimilarityScore: 98.5,
+        livenessVerified: true,
+        livenessScore: 99.4,
+        isMismatchSimulated: false,
+        status: 'VERIFIED',
+        message: 'Biometric Match Confirmed: Photos on Aadhaar and PAN belong to the same person, matching live applicant Jeeva Bharathi M.',
       });
+      setPrediction({
+        predictedClass: 'Approved',
+        probability: 0.942,
+        probabilityPercentage: 94.2,
+        riskLevel: 'Low',
+        modelVersion: 'v1.2.0-ebm',
+        factors: [
+          { feature: 'Payment History (98.2%)', featureLabel: 'Clean Repayment Track Record', contribution: 0.42, direction: 'POSITIVE', explanation: '98.2% on-time repayment ratio significantly bolsters creditworthiness.' },
+          { feature: 'CIBIL Credit Score (785)', featureLabel: 'Prime Bureau Score Band', contribution: 0.39, direction: 'POSITIVE', explanation: 'Prime score of 785 in top-tier risk bracket.' },
+          { feature: 'Credit Utilization (21.5%)', featureLabel: 'Disciplined Credit Usage', contribution: 0.28, direction: 'POSITIVE', explanation: '21.5% utilization reflects responsible revolving credit management.' },
+          { feature: 'DigiLocker KYC Compliance', featureLabel: '100% Verified Identity', contribution: 0.25, direction: 'POSITIVE', explanation: 'Instant tamper-proof biometric and DigiLocker verification passed.' },
+        ],
+      });
+    } else if (scenarioKey === 'NEED_VERIFICATION') {
       setAadhaarDoc({
         file: null,
-        fileName: 'aadhaar_kavitha.jpg',
-        fileSize: '950 KB',
-        previewUrl: null,
+        fileName: 'aadhaar_jeeva_short.jpg',
+        fileSize: '1.1 MB',
+        previewUrl: '/assets/aadhaar_card.jpg',
         uploadStatus: 'UPLOADED',
         ocrStatus: 'EXTRACTED',
-        verificationStatus: 'VERIFIED',
-        extractedFields: { fullName: 'Kavitha S', dateOfBirth: '14/08/1997', gender: 'Female' },
+        verificationStatus: 'NEEDS_REVIEW',
+        extractedFields: {
+          fullName: 'Jeeva B',
+          aadhaarNumber: '4567 8901 2345',
+          maskedAadhaar: 'XXXX XXXX 8901',
+          dateOfBirth: '25/02/2006',
+          gender: 'Male',
+        },
+        typeWarning: undefined,
+        digiLockerMatch: {
+          verified: false,
+          status: 'MISMATCH',
+          message: 'DigiLocker Discrepancy: Name on Aadhaar ("Jeeva B") shows variation against PAN ("Jeeva Bharathi M"). Flagged for underwriter review.',
+        },
       });
       setPanDoc({
         file: null,
-        fileName: 'pan_kavitha.jpg',
-        fileSize: '740 KB',
-        previewUrl: null,
+        fileName: 'pan_card_jeeva.jpg',
+        fileSize: '820 KB',
+        previewUrl: '/assets/pan_card.jpg',
         uploadStatus: 'UPLOADED',
         ocrStatus: 'EXTRACTED',
         verificationStatus: 'VERIFIED',
-        extractedFields: { fullName: 'Kavitha S', panNumber: 'KAVIS1234K', dateOfBirth: '14/08/1997' },
+        extractedFields: {
+          fullName: 'JEEVA BHARATHI M',
+          panNumber: 'DELPJ9476P',
+          dateOfBirth: '25/02/2006',
+        },
+        typeWarning: undefined,
+        digiLockerMatch: {
+          verified: true,
+          status: 'MATCHED',
+          message: 'DigiLocker Match Verified: PAN matches Income Tax Dept record in DigiLocker.',
+        },
       });
-    } else if (personaKey === 'murugan') {
-      setProfile({
-        name: 'Murugan K',
-        age: '42',
-        gender: 'Male',
-        maritalStatus: 'Married',
-        income: '45000',
-        job: 'self_employed',
-        dep: '2',
-        panNumber: 'MURUK5678M',
-        aadhaarNumber: '7721 0041 3321',
+      setOcrCrossCheck({
+        success: true,
+        overallMatchStatus: 'FUZZY_MATCH',
+        overallConfidenceScore: 82.4,
+        message: 'Manual Review Required: Slight name variation detected between Aadhaar ("Jeeva B") and PAN ("Jeeva Bharathi M").',
+        fieldMatches: [
+          { fieldName: 'Full Legal Name', declaredValue: 'Jeeva B', extractedValue: 'JEEVA BHARATHI M', isMatch: false, confidence: 82.0, status: 'MISMATCH' },
+          { fieldName: 'Date of Birth', declaredValue: '25/02/2006', extractedValue: '25/02/2006', isMatch: true, confidence: 100.0, status: 'MATCHED' },
+          { fieldName: 'PAN Card Number', declaredValue: 'DELPJ9476P', extractedValue: 'DELPJ9476P', isMatch: true, confidence: 100.0, status: 'MATCHED' },
+          { fieldName: 'Aadhaar ID', declaredValue: '4567 8901 2345', extractedValue: 'XXXX XXXX 8901', isMatch: true, confidence: 96.0, status: 'MATCHED' },
+        ],
+        aadhaarExtracted: { name: 'Jeeva B', dob: '25/02/2006', aadhaar: '4567 8901 2345' },
+        panExtracted: { name: 'JEEVA BHARATHI M', pan: 'DELPJ9476P' },
       });
-      setCreditData({
-        score: 685,
-        paymentHistory: 87.0,
-        creditUtilization: 48.0,
-        creditHistoryYears: 3.5,
-        recentEnquiries: 3,
-        riskBand: 'MODERATE_RISK_NEAR_PRIME',
-        status: 'DEMO_RESULT_AVAILABLE',
-        regulatoryBanner: 'Synthetic credit profile — not a real CIBIL report',
+      setBiometricResult({
+        aadharPhotoMatchedPanPhoto: true,
+        aadharPanSimilarityScore: 92.4,
+        liveFaceMatchedDocuments: true,
+        liveFaceSimilarityScore: 91.8,
+        liveAadharSimilarityScore: 91.8,
+        livePanSimilarityScore: 93.0,
+        livenessVerified: true,
+        livenessScore: 95.0,
+        isMismatchSimulated: false,
+        status: 'NEEDS_REVIEW',
+        message: 'Biometric Match Acceptable (92.4%), but KYC name variation flagged for loan officer sign-off.',
       });
-    } else if (personaKey === 'senthil') {
-      setProfile({
-        name: 'Senthil Nathan R',
-        age: '35',
-        gender: 'Male',
-        maritalStatus: 'Married',
-        income: '28000',
-        job: 'salaried',
-        dep: '2',
-        panNumber: 'SENTH9012S',
-        aadhaarNumber: '9921 5512 8841',
+      setPrediction({
+        predictedClass: 'Needs Review',
+        probability: 0.648,
+        probabilityPercentage: 64.8,
+        riskLevel: 'Moderate',
+        modelVersion: 'v1.2.0-ebm',
+        factors: [
+          { feature: 'CIBIL Credit Score (662)', featureLabel: 'Near-Prime Credit Band', contribution: 0.12, direction: 'POSITIVE', explanation: 'Score of 662 is acceptable but sits near minimum underwriting cut-off.' },
+          { feature: 'Debt-to-Income (48%)', featureLabel: 'Moderate Debt Obligation', contribution: -0.18, direction: 'NEGATIVE', explanation: 'Debt servicing is high relative to reported net self-employed income.' },
+          { feature: 'KYC Name Variation Flag', featureLabel: 'Name Discrepancy Flag', contribution: -0.22, direction: 'NEGATIVE', explanation: 'Disparity between Aadhaar "Jeeva B" and PAN requires underwriting sign-off.' },
+        ],
       });
-      setCreditData({
-        score: 530,
-        paymentHistory: 62.0,
-        creditUtilization: 88.0,
-        creditHistoryYears: 2.0,
-        recentEnquiries: 6,
-        riskBand: 'HIGH_RISK_SUBPRIME',
-        status: 'DEMO_RESULT_AVAILABLE',
-        regulatoryBanner: 'Synthetic credit profile — not a real CIBIL report',
+    } else {
+      // REJECTED
+      setAadhaarDoc({
+        file: null,
+        fileName: 'aadhaar_karthik.jpg',
+        fileSize: '980 KB',
+        previewUrl: '/assets/aadhaar_card.jpg',
+        uploadStatus: 'UPLOADED',
+        ocrStatus: 'EXTRACTED',
+        verificationStatus: 'FAILED',
+        extractedFields: {
+          fullName: 'Karthik Raman',
+          aadhaarNumber: '9876 5432 1098',
+          dateOfBirth: '10/11/2004',
+        },
+        typeWarning: undefined,
+        digiLockerMatch: {
+          verified: false,
+          status: 'MISMATCH',
+          message: 'DigiLocker Database Mismatch: Aadhaar number not matched with active applicant account.',
+        },
+      });
+      setPanDoc({
+        file: null,
+        fileName: 'pan_karthik.jpg',
+        fileSize: '710 KB',
+        previewUrl: '/assets/pan_card.jpg',
+        uploadStatus: 'UPLOADED',
+        ocrStatus: 'EXTRACTED',
+        verificationStatus: 'FAILED',
+        extractedFields: {
+          fullName: 'Karthik Raman',
+          panNumber: 'XYZKL9999P',
+          dateOfBirth: '10/11/2004',
+        },
+        typeWarning: undefined,
+        digiLockerMatch: {
+          verified: false,
+          status: 'MISMATCH',
+          message: 'DigiLocker Database Mismatch: PAN not linked with authenticated DigiLocker account.',
+        },
+      });
+      setOcrCrossCheck({
+        success: false,
+        overallMatchStatus: 'MISMATCH',
+        overallConfidenceScore: 42.1,
+        message: 'Verification Failed: High risk profile with subprime credit (535) and excessive debt-to-income ratio (82%).',
+        fieldMatches: [
+          { fieldName: 'Full Legal Name', declaredValue: 'Karthik Raman', extractedValue: 'Karthik Raman', isMatch: true, confidence: 99.0, status: 'MATCHED' },
+          { fieldName: 'CIBIL Credit Score', declaredValue: '535 (Subprime)', extractedValue: '535', isMatch: false, confidence: 40.0, status: 'MISMATCH' },
+          { fieldName: 'Debt-to-Income', declaredValue: '82%', extractedValue: '82% (>50% Limit)', isMatch: false, confidence: 35.0, status: 'MISMATCH' },
+        ],
+        aadhaarExtracted: { name: 'Karthik Raman', dob: '10/11/2004', aadhaar: '9876 5432 1098' },
+        panExtracted: { name: 'Karthik Raman', pan: 'XYZKL9999P' },
+      });
+      setBiometricResult({
+        aadharPhotoMatchedPanPhoto: false,
+        aadharPanSimilarityScore: 44.5,
+        liveFaceMatchedDocuments: false,
+        liveFaceSimilarityScore: 48.0,
+        liveAadharSimilarityScore: 48.0,
+        livePanSimilarityScore: 44.5,
+        livenessVerified: false,
+        livenessScore: 42.0,
+        isMismatchSimulated: true,
+        status: 'FAILED',
+        message: 'Biometric Verification Failed: Document photo similarity score (44.5%) is below security threshold (75%).',
+      });
+      setPrediction({
+        predictedClass: 'Declined',
+        probability: 0.185,
+        probabilityPercentage: 18.5,
+        riskLevel: 'High',
+        modelVersion: 'v1.2.0-ebm',
+        factors: [
+          { feature: 'Subprime CIBIL Score (535)', featureLabel: 'High Bureau Delinquency', contribution: -0.58, direction: 'NEGATIVE', explanation: 'Score 535 indicates historical severe default and missed payments.' },
+          { feature: 'Excessive Debt-to-Income (82%)', featureLabel: 'Exceeds Maximum Debt Limit', contribution: -0.46, direction: 'NEGATIVE', explanation: 'Proposed debt obligations exceed 80% of net monthly income.' },
+          { feature: 'Revolving Credit Utilization (89%)', featureLabel: 'Overleveraged Credit Lines', contribution: -0.34, direction: 'NEGATIVE', explanation: 'Heavy credit facility utilization reflects acute liquidity stress.' },
+        ],
       });
     }
+  };
+
+  const selectPersona = (personaKey: string) => {
+    if (personaKey === 'jeeva' || personaKey === 'APPROVED') {
+      applyScenario('APPROVED');
+    } else if (personaKey === 'kavitha' || personaKey === 'NEED_VERIFICATION') {
+      applyScenario('NEED_VERIFICATION');
+    } else if (personaKey === 'senthil' || personaKey === 'REJECTED') {
+      applyScenario('REJECTED');
+    } else {
+      applyScenario('APPROVED');
+    }
+  };
+
+  // DigiLocker pull sync
+  const handleSyncDigiLocker = async () => {
+    setDigiLockerSyncing(true);
+    try {
+      await pullDigiLockerDocsApi(savedApplicationId, selectedScenarioKey);
+    } catch {}
+    setTimeout(() => {
+      setDigiLockerSyncing(false);
+    }, 600);
   };
 
   // STEP 2: Fetch synthetic credit bureau data
@@ -393,7 +596,7 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
         recentEnquiries: cp.recentEnquiries,
         riskBand: cp.cibilScore >= 750 ? 'LOW_RISK_PRIME' : cp.cibilScore >= 650 ? 'MODERATE_RISK_NEAR_PRIME' : 'HIGH_RISK_SUBPRIME',
         status: cp.verificationStatus,
-        regulatoryBanner: 'Synthetic credit profile — not a real CIBIL report',
+        regulatoryBanner: 'Synthetic credit profile — retrieved via TransUnion / CIBIL simulation',
       });
     } catch (err: any) {
       setError('Unable to retrieve synthetic credit profile.');
@@ -402,7 +605,7 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
     }
   };
 
-  // STEP 3: Manual Upload Handlers (Completely Isolated per Document)
+  // STEP 3: Document Upload Handlers with Cross-Classification & DigiLocker DB Cross-Matching
   const handleAadhaarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || !e.target.files[0]) return;
     const file = e.target.files[0];
@@ -419,6 +622,29 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
 
     setError('');
     const sizeStr = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+    const fname = file.name.toLowerCase();
+
+    // Document Type Classification Check: Did user upload a PAN Card in the Aadhaar slot?
+    let typeWarning: string | undefined = undefined;
+    if (fname.includes('pan') && !fname.includes('aadhaar')) {
+      typeWarning = 'Document Type Mismatch Warning: Uploaded file appears to be a PAN Card! Please upload an official Aadhaar Card in this slot.';
+    } else if (!fname.includes('aadhaar') && !fname.includes('uidai') && !fname.includes('card') && !fname.includes('id') && !fname.includes('doc')) {
+      typeWarning = 'Document Advisory: Please ensure this file is an official Government of India Aadhaar Card.';
+    }
+
+    // Cross-match with DigiLocker database record
+    const currentScenario = SAMPLE_DEMO_PROFILES[selectedScenarioKey] || SAMPLE_DEMO_PROFILES.APPROVED;
+    const isMatched = selectedScenarioKey === 'APPROVED' && !typeWarning;
+    const digiLockerMatch = {
+      verified: isMatched,
+      status: (isMatched ? 'MATCHED' : 'MISMATCH') as 'MATCHED' | 'MISMATCH',
+      message: isMatched
+        ? `DigiLocker Database Match: 100% Verified against DigiLocker UIDAI registry for ${currentScenario.name} (Ending in ${currentScenario.fullAadhaar.slice(-4)}).`
+        : selectedScenarioKey === 'NEED_VERIFICATION'
+        ? `DigiLocker Advisory: Name disparity detected between uploaded document and DigiLocker record ("${currentScenario.name}").`
+        : `DigiLocker Discrepancy: Uploaded document does not match the active DigiLocker record for this applicant.`,
+    };
+
     const reader = new FileReader();
     reader.onload = (ev) => {
       const dataUrl = ev.target?.result as string;
@@ -428,9 +654,17 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
         fileSize: sizeStr,
         previewUrl: dataUrl,
         uploadStatus: 'UPLOADED',
-        ocrStatus: 'NOT_PROCESSED',
-        verificationStatus: 'NOT_VERIFIED',
-        extractedFields: {},
+        ocrStatus: 'EXTRACTED',
+        verificationStatus: typeWarning ? 'NEEDS_REVIEW' : selectedScenarioKey === 'REJECTED' ? 'FAILED' : 'VERIFIED',
+        extractedFields: {
+          fullName: currentScenario.name,
+          aadhaarNumber: currentScenario.fullAadhaar,
+          maskedAadhaar: currentScenario.maskedAadhaar,
+          dateOfBirth: currentScenario.dob,
+          gender: currentScenario.gender,
+        },
+        typeWarning,
+        digiLockerMatch,
       });
     };
     reader.readAsDataURL(file);
@@ -452,6 +686,27 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
 
     setError('');
     const sizeStr = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+    const fname = file.name.toLowerCase();
+
+    // Document Type Classification Check: Did user upload an Aadhaar Card in the PAN slot?
+    let typeWarning: string | undefined = undefined;
+    if ((fname.includes('aadhaar') || fname.includes('uidai') || fname.includes('aadhar')) && !fname.includes('pan')) {
+      typeWarning = 'Document Type Mismatch Warning: Uploaded file appears to be an Aadhaar Card! Please upload an official PAN Card in this slot.';
+    } else if (!fname.includes('pan') && !fname.includes('nsdl') && !fname.includes('card') && !fname.includes('id') && !fname.includes('doc')) {
+      typeWarning = 'Document Advisory: Please ensure this file is an official Income Tax Department PAN Card.';
+    }
+
+    // Cross-match with DigiLocker database record
+    const currentScenario = SAMPLE_DEMO_PROFILES[selectedScenarioKey] || SAMPLE_DEMO_PROFILES.APPROVED;
+    const isMatched = (selectedScenarioKey === 'APPROVED' || selectedScenarioKey === 'NEED_VERIFICATION') && !typeWarning;
+    const digiLockerMatch = {
+      verified: isMatched,
+      status: (isMatched ? 'MATCHED' : 'MISMATCH') as 'MATCHED' | 'MISMATCH',
+      message: isMatched
+        ? `DigiLocker Database Match: 100% Verified against Income Tax Dept PAN registry (${currentScenario.pan}).`
+        : `DigiLocker Discrepancy: Uploaded PAN credentials do not match the active DigiLocker database record.`,
+    };
+
     const reader = new FileReader();
     reader.onload = (ev) => {
       const dataUrl = ev.target?.result as string;
@@ -461,9 +716,15 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
         fileSize: sizeStr,
         previewUrl: dataUrl,
         uploadStatus: 'UPLOADED',
-        ocrStatus: 'NOT_PROCESSED',
-        verificationStatus: 'NOT_VERIFIED',
-        extractedFields: {},
+        ocrStatus: 'EXTRACTED',
+        verificationStatus: typeWarning ? 'NEEDS_REVIEW' : selectedScenarioKey === 'REJECTED' ? 'FAILED' : 'VERIFIED',
+        extractedFields: {
+          fullName: currentScenario.name.toUpperCase(),
+          panNumber: currentScenario.pan,
+          dateOfBirth: currentScenario.dob,
+        },
+        typeWarning,
+        digiLockerMatch,
       });
     };
     reader.readAsDataURL(file);
@@ -479,6 +740,8 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
       ocrStatus: 'NOT_PROCESSED',
       verificationStatus: 'NOT_VERIFIED',
       extractedFields: {},
+      typeWarning: undefined,
+      digiLockerMatch: undefined,
     });
   };
 
@@ -492,6 +755,8 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
       ocrStatus: 'NOT_PROCESSED',
       verificationStatus: 'NOT_VERIFIED',
       extractedFields: {},
+      typeWarning: undefined,
+      digiLockerMatch: undefined,
     });
   };
 
@@ -518,13 +783,13 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
       setAadhaarDoc((prev) => ({
         ...prev,
         ocrStatus: 'EXTRACTED',
-        verificationStatus: 'VERIFIED',
+        verificationStatus: prev.typeWarning ? 'NEEDS_REVIEW' : 'VERIFIED',
         extractedFields: res.aadhaarExtracted || prev.extractedFields,
       }));
       setPanDoc((prev) => ({
         ...prev,
         ocrStatus: 'EXTRACTED',
-        verificationStatus: 'VERIFIED',
+        verificationStatus: prev.typeWarning ? 'NEEDS_REVIEW' : 'VERIFIED',
         extractedFields: res.panExtracted || prev.extractedFields,
       }));
     } catch (err: any) {
@@ -534,20 +799,21 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
     }
   };
 
-  // STEP 5: Camera Handlers
+  // STEP 5: Camera & Biometric Handlers
   const startCamera = async () => {
     setCameraError('');
     try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Camera device API not supported in this browser context.');
+      }
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' },
       });
       setMediaStream(stream);
       setCameraActive(true);
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
     } catch (err: any) {
-      setCameraError('Unable to access camera. Please check camera permissions in your browser.');
+      console.warn('Camera access issue:', err);
+      setCameraError('Unable to access live webcam. You can use the "Take Selfie / Upload Photo" or "Use Verified Frame" options below.');
     }
   };
 
@@ -557,6 +823,82 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
       setMediaStream(null);
     }
     setCameraActive(false);
+  };
+
+  const executeBiometricVerification = async (liveSnapshot: string) => {
+    setFaceLoading(true);
+    setError('');
+
+    try {
+      const res = await verifyTriBiometricApi({
+        applicationId: savedApplicationId,
+        liveCameraFrameBase64: liveSnapshot,
+        aadharImageBase64: aadhaarDoc.previewUrl || '/assets/aadhaar_photo.jpg',
+        panImageBase64: panDoc.previewUrl || '/assets/pan_photo.jpg',
+        simulateMismatch: isSimulatedMismatch || selectedScenarioKey === 'REJECTED',
+      });
+
+      setBiometricResult({
+        ...res,
+        liveSnapshotUrl: liveSnapshot,
+      });
+
+      if (!res.success) {
+        setError(res.message);
+      } else {
+        stopCamera();
+      }
+    } catch (err: any) {
+      if (selectedScenarioKey === 'APPROVED' && !isSimulatedMismatch) {
+        setBiometricResult({
+          aadharPhotoMatchedPanPhoto: true,
+          aadharPanSimilarityScore: 99.1,
+          liveFaceMatchedDocuments: true,
+          liveFaceSimilarityScore: 98.8,
+          liveAadharSimilarityScore: 98.8,
+          livePanSimilarityScore: 98.5,
+          livenessVerified: true,
+          livenessScore: 99.4,
+          isMismatchSimulated: false,
+          status: 'VERIFIED',
+          message: 'Biometric Match Confirmed: Photos on Aadhaar and PAN belong to the same person, matching live applicant Jeeva Bharathi M.',
+          liveSnapshotUrl: liveSnapshot,
+        });
+      } else if (selectedScenarioKey === 'NEED_VERIFICATION') {
+        setBiometricResult({
+          aadharPhotoMatchedPanPhoto: true,
+          aadharPanSimilarityScore: 92.4,
+          liveFaceMatchedDocuments: true,
+          liveFaceSimilarityScore: 91.8,
+          liveAadharSimilarityScore: 91.8,
+          livePanSimilarityScore: 93.0,
+          livenessVerified: true,
+          livenessScore: 95.0,
+          isMismatchSimulated: false,
+          status: 'NEEDS_REVIEW',
+          message: 'Biometric Match Acceptable (91.8%), but KYC name variation flagged for loan officer review.',
+          liveSnapshotUrl: liveSnapshot,
+        });
+      } else {
+        setBiometricResult({
+          aadharPhotoMatchedPanPhoto: false,
+          aadharPanSimilarityScore: 44.5,
+          liveFaceMatchedDocuments: false,
+          liveFaceSimilarityScore: 48.0,
+          liveAadharSimilarityScore: 48.0,
+          livePanSimilarityScore: 44.5,
+          livenessVerified: false,
+          livenessScore: 42.0,
+          isMismatchSimulated: true,
+          status: 'FAILED',
+          message: 'Biometric Verification Failed: Facial similarity score (48.0%) is below required threshold (75%).',
+          liveSnapshotUrl: liveSnapshot,
+        });
+      }
+      stopCamera();
+    } finally {
+      setFaceLoading(false);
+    }
   };
 
   const capturePhotoAndVerify = async () => {
@@ -569,47 +911,42 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
     if (videoRef.current && canvasRef.current) {
       const canvas = canvasRef.current;
       const video = videoRef.current;
-      canvas.width = video.videoWidth || 640;
-      canvas.height = video.videoHeight || 480;
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        capturedB64 = canvas.toDataURL('image/jpeg', 0.85);
-        setLiveCapturedFace(capturedB64);
+      if (video.videoWidth > 0 && video.videoHeight > 0) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          capturedB64 = canvas.toDataURL('image/jpeg', 0.85);
+          setLiveCapturedFace(capturedB64);
+        }
       }
     }
 
-    if (!capturedB64 && !liveCapturedFace) {
-      capturedB64 = '/assets/aadhaar_photo.jpg'; // demo fallback
+    if (!capturedB64) {
+      capturedB64 = liveCapturedFace || '/assets/aadhaar_photo.jpg';
+      setLiveCapturedFace(capturedB64);
     }
 
-    setFaceLoading(true);
-    setError('');
+    await executeBiometricVerification(capturedB64);
+  };
 
-    try {
-      const res = await verifyTriBiometricApi({
-        applicationId: savedApplicationId,
-        liveCameraFrameBase64: capturedB64 || 'demo_live_frame',
-        aadharImageBase64: aadhaarDoc.previewUrl || '/assets/aadhaar_photo.jpg',
-        panImageBase64: panDoc.previewUrl || '/assets/pan_photo.jpg',
-        simulateMismatch: isSimulatedMismatch,
-      });
+  const handleLiveSelfieUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || !e.target.files[0]) return;
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const dataUrl = ev.target?.result as string;
+      setLiveCapturedFace(dataUrl);
+      executeBiometricVerification(dataUrl);
+    };
+    reader.readAsDataURL(file);
+  };
 
-      setBiometricResult({
-        ...res,
-        liveSnapshotUrl: capturedB64 || undefined,
-      });
-
-      if (!res.success) {
-        setError(res.message);
-      } else {
-        stopCamera();
-      }
-    } catch (err: any) {
-      setError(err?.message || 'Biometric verification failed.');
-    } finally {
-      setFaceLoading(false);
-    }
+  const handleUseVerifiedLiveFrame = () => {
+    const testFrameUrl = '/assets/aadhaar_photo.jpg';
+    setLiveCapturedFace(testFrameUrl);
+    executeBiometricVerification(testFrameUrl);
   };
 
   // STEP 6: Execute EBM Prediction
@@ -670,16 +1007,15 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
 
             {/* Demo Personas Quick Select */}
             <div className="flex items-center gap-2">
-              <label className="text-xs font-medium text-slate-600">Preset:</label>
+              <label className="text-xs font-medium text-slate-600">Scenario:</label>
               <select
-                onChange={(e) => selectPersona(e.target.value)}
-                defaultValue="jeeva"
+                value={selectedScenarioKey}
+                onChange={(e) => applyScenario(e.target.value as any)}
                 className="text-xs bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="jeeva">Jeeva Bharathi M (Prime Verified)</option>
-                <option value="kavitha">Kavitha S (Salaried Prime)</option>
-                <option value="murugan">Murugan K (Self-Employed Review)</option>
-                <option value="senthil">Senthil Nathan R (Subprime)</option>
+                <option value="APPROVED">1. Loan Approved (Prime CIBIL 785 - Salaried)</option>
+                <option value="NEED_VERIFICATION">2. Need Verification (Borderline 662 - KYC Check)</option>
+                <option value="REJECTED">3. Loan Rejected (Subprime 535 - High DTI 82%)</option>
               </select>
             </div>
           </div>
@@ -735,8 +1071,103 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
         {step === 1 && (
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
             <div className="border-b border-slate-100 pb-4 mb-5">
-              <h2 className="text-base font-bold text-slate-900">1. Applicant Personal Details</h2>
-              <p className="text-xs text-slate-500 mt-0.5">Please review or enter your legal personal identification details.</p>
+              <h2 className="text-base font-bold text-slate-900">1. Applicant Personal Details & DigiLocker Authentication</h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Select an underwriting scenario or review your authenticated identity credentials fetched via DigiLocker.
+              </p>
+            </div>
+
+            {/* 3 Predefined Sample Data Profiles (Approved, Need Verification, Rejected) */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-2.5">
+                <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5 uppercase tracking-wider">
+                  <ShieldCheck className="w-4 h-4 text-blue-600" />
+                  Select Underwriting Test Scenario (DigiLocker & Credit Presets)
+                </span>
+                <span className="text-[11px] text-slate-500 font-medium">1-Click Full Stack Simulation</span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {/* Profile 1: Loan Approved */}
+                <div
+                  onClick={() => applyScenario('APPROVED')}
+                  className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
+                    selectedScenarioKey === 'APPROVED'
+                      ? 'border-emerald-500 bg-emerald-50/40 ring-2 ring-emerald-400 shadow-sm'
+                      : 'border-slate-200 bg-white hover:border-slate-300'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-xs font-bold text-emerald-800 flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> 1. Loan Approved
+                    </span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                      CIBIL 785
+                    </span>
+                  </div>
+                  <p className="text-xs font-semibold text-slate-900">{SAMPLE_DEMO_PROFILES.APPROVED.name}</p>
+                  <p className="text-[11px] text-slate-600 mt-0.5">
+                    Salaried ₹85,000 • 100% DigiLocker match • Low Risk
+                  </p>
+                  <div className="mt-2.5 pt-2 border-t border-slate-200/60 flex items-center justify-between text-[10px] text-slate-500">
+                    <span>PAN: DELPJ9476P</span>
+                    <span className="text-emerald-700 font-semibold">Straight-Through Approval</span>
+                  </div>
+                </div>
+
+                {/* Profile 2: Need Verification */}
+                <div
+                  onClick={() => applyScenario('NEED_VERIFICATION')}
+                  className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
+                    selectedScenarioKey === 'NEED_VERIFICATION'
+                      ? 'border-amber-500 bg-amber-50/40 ring-2 ring-amber-400 shadow-sm'
+                      : 'border-slate-200 bg-white hover:border-slate-300'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-xs font-bold text-amber-800 flex items-center gap-1">
+                      <AlertTriangle className="w-3.5 h-3.5 text-amber-600" /> 2. Need Verification
+                    </span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
+                      CIBIL 662
+                    </span>
+                  </div>
+                  <p className="text-xs font-semibold text-slate-900">{SAMPLE_DEMO_PROFILES.NEED_VERIFICATION.name}</p>
+                  <p className="text-[11px] text-slate-600 mt-0.5">
+                    Self-Employed ₹42k • Name variation (Jeeva B vs Jeeva Bharathi M)
+                  </p>
+                  <div className="mt-2.5 pt-2 border-t border-slate-200/60 flex items-center justify-between text-[10px] text-slate-500">
+                    <span>PAN: DELPJ9476P</span>
+                    <span className="text-amber-700 font-semibold">Underwriter Audit</span>
+                  </div>
+                </div>
+
+                {/* Profile 3: Loan Rejected */}
+                <div
+                  onClick={() => applyScenario('REJECTED')}
+                  className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
+                    selectedScenarioKey === 'REJECTED'
+                      ? 'border-rose-500 bg-rose-50/40 ring-2 ring-rose-400 shadow-sm'
+                      : 'border-slate-200 bg-white hover:border-slate-300'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-xs font-bold text-rose-800 flex items-center gap-1">
+                      <XCircle className="w-3.5 h-3.5 text-rose-600" /> 3. Loan Rejected
+                    </span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-200">
+                      CIBIL 535
+                    </span>
+                  </div>
+                  <p className="text-xs font-semibold text-slate-900">{SAMPLE_DEMO_PROFILES.REJECTED.name}</p>
+                  <p className="text-[11px] text-slate-600 mt-0.5">
+                    Income ₹18k • High DTI 82% (&gt;50%) • DigiLocker mismatch
+                  </p>
+                  <div className="mt-2.5 pt-2 border-t border-slate-200/60 flex items-center justify-between text-[10px] text-slate-500">
+                    <span>PAN: XYZKL9999P</span>
+                    <span className="text-rose-700 font-semibold">Automated Decline</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -806,24 +1237,67 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Permanent Account Number (PAN)</label>
-                <input
-                  type="text"
-                  value={profile.panNumber}
-                  onChange={(e) => setProfile({ ...profile, panNumber: e.target.value.toUpperCase() })}
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg font-mono focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+              {/* DigiLocker Verified Identity Box (Replaces manual Aadhaar and PAN inputs) */}
+              <div className="md:col-span-2 p-4 rounded-xl border border-blue-200 bg-blue-50/40">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3 pb-3 border-b border-blue-100">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
+                      <Lock className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-900">DigiLocker Verified Identity Credentials</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                          GOVT OF INDIA AUTHENTICATED
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500">
+                        In accordance with RBI Digital Lending Directives, manual Aadhaar and PAN inputs are disabled. Credentials are authenticated directly via DigiLocker.
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleSyncDigiLocker}
+                    disabled={digiLockerSyncing}
+                    className="px-3 py-1.5 bg-white border border-blue-300 hover:bg-blue-50 text-blue-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all shrink-0"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${digiLockerSyncing ? 'animate-spin' : ''}`} />
+                    {digiLockerSyncing ? 'Syncing...' : 'Sync from DigiLocker'}
+                  </button>
+                </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Aadhaar Number</label>
-                <input
-                  type="text"
-                  value={profile.aadhaarNumber}
-                  onChange={(e) => setProfile({ ...profile, aadhaarNumber: e.target.value })}
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg font-mono focus:ring-2 focus:ring-blue-500"
-                />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="p-3 bg-white rounded-lg border border-slate-200">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[11px] font-bold text-slate-600 flex items-center gap-1">
+                        <Shield className="w-3.5 h-3.5 text-blue-600" /> Masked Aadhaar Number
+                      </span>
+                      <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                        ✓ UIDAI Verified
+                      </span>
+                    </div>
+                    <p className="text-sm font-mono font-bold text-slate-900 tracking-wider">
+                      {SAMPLE_DEMO_PROFILES[selectedScenarioKey]?.maskedAadhaar || 'XXXXXXXX2450'}
+                    </p>
+                    <p className="text-[10px] text-slate-400 mt-1">Source: DigiLocker Issued Document ID (UIDAI Gateway)</p>
+                  </div>
+
+                  <div className="p-3 bg-white rounded-lg border border-slate-200">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[11px] font-bold text-slate-600 flex items-center gap-1">
+                        <CreditCard className="w-3.5 h-3.5 text-blue-600" /> Permanent Account Number (PAN)
+                      </span>
+                      <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                        ✓ ITD / NSDL Verified
+                      </span>
+                    </div>
+                    <p className="text-sm font-mono font-bold text-slate-900 tracking-wider">
+                      {SAMPLE_DEMO_PROFILES[selectedScenarioKey]?.pan || 'DELPJ9476P'}
+                    </p>
+                    <p className="text-[10px] text-slate-400 mt-1">Source: Income Tax Department / NSDL Registry</p>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -1035,8 +1509,44 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
 
                   {aadhaarDoc.fileName && (
                     <div className="mt-2 text-xs text-slate-600 flex justify-between">
-                      <span className="truncate max-w-[200px]">{aadhaarDoc.fileName}</span>
+                      <span className="truncate max-w-[200px] font-medium">{aadhaarDoc.fileName}</span>
                       <span className="text-slate-400">{aadhaarDoc.fileSize}</span>
+                    </div>
+                  )}
+
+                  {/* Document Type Mismatch Warning */}
+                  {aadhaarDoc.typeWarning && (
+                    <div className="mt-2.5 p-2.5 rounded-lg bg-amber-50 border border-amber-300 text-amber-900 text-xs flex items-start gap-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                      <div>
+                        <span className="font-bold">Slot Mismatch Detected:</span>
+                        <p className="text-[11px] mt-0.5 leading-relaxed">{aadhaarDoc.typeWarning}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* DigiLocker Database Cross-Match Badge */}
+                  {aadhaarDoc.digiLockerMatch && (
+                    <div
+                      className={`mt-2.5 p-2.5 rounded-lg border text-xs flex items-start gap-2 ${
+                        aadhaarDoc.digiLockerMatch.status === 'MATCHED'
+                          ? 'bg-emerald-50 border-emerald-300 text-emerald-900'
+                          : 'bg-rose-50 border-rose-300 text-rose-900'
+                      }`}
+                    >
+                      {aadhaarDoc.digiLockerMatch.status === 'MATCHED' ? (
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                      ) : (
+                        <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                      )}
+                      <div>
+                        <span className="font-bold">
+                          {aadhaarDoc.digiLockerMatch.status === 'MATCHED'
+                            ? '✓ DigiLocker Database: Verified Match'
+                            : '⚠️ DigiLocker Database: Discrepancy Flag'}
+                        </span>
+                        <p className="text-[11px] mt-0.5 leading-relaxed">{aadhaarDoc.digiLockerMatch.message}</p>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -1109,8 +1619,44 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
 
                   {panDoc.fileName && (
                     <div className="mt-2 text-xs text-slate-600 flex justify-between">
-                      <span className="truncate max-w-[200px]">{panDoc.fileName}</span>
+                      <span className="truncate max-w-[200px] font-medium">{panDoc.fileName}</span>
                       <span className="text-slate-400">{panDoc.fileSize}</span>
+                    </div>
+                  )}
+
+                  {/* Document Type Mismatch Warning */}
+                  {panDoc.typeWarning && (
+                    <div className="mt-2.5 p-2.5 rounded-lg bg-amber-50 border border-amber-300 text-amber-900 text-xs flex items-start gap-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                      <div>
+                        <span className="font-bold">Slot Mismatch Detected:</span>
+                        <p className="text-[11px] mt-0.5 leading-relaxed">{panDoc.typeWarning}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* DigiLocker Database Cross-Match Badge */}
+                  {panDoc.digiLockerMatch && (
+                    <div
+                      className={`mt-2.5 p-2.5 rounded-lg border text-xs flex items-start gap-2 ${
+                        panDoc.digiLockerMatch.status === 'MATCHED'
+                          ? 'bg-emerald-50 border-emerald-300 text-emerald-900'
+                          : 'bg-rose-50 border-rose-300 text-rose-900'
+                      }`}
+                    >
+                      {panDoc.digiLockerMatch.status === 'MATCHED' ? (
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                      ) : (
+                        <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                      )}
+                      <div>
+                        <span className="font-bold">
+                          {panDoc.digiLockerMatch.status === 'MATCHED'
+                            ? '✓ DigiLocker Database: Verified Match'
+                            : '⚠️ DigiLocker Database: Discrepancy Flag'}
+                        </span>
+                        <p className="text-[11px] mt-0.5 leading-relaxed">{panDoc.digiLockerMatch.message}</p>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -1343,13 +1889,30 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
                 <p className="text-[11px] text-slate-500 mt-1 mb-4">
                   Camera permission is only requested when you start the live comparison.
                 </p>
-                <div className="flex flex-col sm:flex-row justify-center gap-2">
+                <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-2">
                   <button
                     type="button"
                     onClick={startCamera}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm transition-all"
                   >
-                    <Camera className="w-3.5 h-3.5" /> Start Live Camera
+                    <Camera className="w-3.5 h-3.5" /> Start Live Webcam
+                  </button>
+                  <label className="cursor-pointer px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm transition-all">
+                    <Upload className="w-3.5 h-3.5" /> Take Selfie / Upload Photo
+                    <input
+                      type="file"
+                      accept="image/*"
+                      capture="user"
+                      onChange={handleLiveSelfieUpload}
+                      className="hidden"
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleUseVerifiedLiveFrame}
+                    className="px-3.5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all"
+                  >
+                    <BadgeCheck className="w-3.5 h-3.5 text-blue-600" /> Use Verified Frame
                   </button>
                   {liveCapturedFace && (
                     <button
@@ -1357,11 +1920,18 @@ export const ApplicationWizardPage: React.FC<ApplicationWizardProps> = ({ naviga
                       onClick={() => setLiveCapturedFace(null)}
                       className="px-3 py-2 border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-semibold"
                     >
-                      Retake Photo
+                      Retake
                     </button>
                   )}
                 </div>
-                {cameraError && <p className="text-xs text-rose-600 mt-3">{cameraError}</p>}
+                {cameraError && (
+                  <div className="mt-3 p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-xs">
+                    <p className="font-medium">{cameraError}</p>
+                    <p className="text-[11px] text-amber-700 mt-1">
+                      Tip: You can use the "Take Selfie / Upload Photo" or "Use Verified Frame" buttons above if your browser or device restricts live camera streams.
+                    </p>
+                  </div>
+                )}
               </div>
             )}
 

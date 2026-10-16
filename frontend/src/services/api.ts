@@ -692,47 +692,134 @@ export const initDigiLockerApi = async (applicationId: string) => {
   }
 };
 
-export const pullDigiLockerDocsApi = async (applicationId: string) => {
+export interface SampleProfileData {
+  key: 'APPROVED' | 'NEED_VERIFICATION' | 'REJECTED';
+  title: string;
+  badge: string;
+  badgeColor: string;
+  name: string;
+  pan: string;
+  maskedAadhaar: string;
+  fullAadhaar: string;
+  dob: string;
+  gender: string;
+  job: string;
+  income: number;
+  dep: number;
+  cibilScore: number;
+  loanAmount: number;
+  loanTenure: number;
+  expectedOutcome: 'APPROVED' | 'NEEDS_REVIEW' | 'REJECTED';
+  description: string;
+}
+
+export const SAMPLE_DEMO_PROFILES: Record<string, SampleProfileData> = {
+  APPROVED: {
+    key: 'APPROVED',
+    title: '1. Loan Approved Profile',
+    badge: 'High CIBIL / 100% KYC Match',
+    badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+    name: 'Jeeva Bharathi M',
+    pan: 'DELPJ9476P',
+    maskedAadhaar: 'XXXXXXXX2450',
+    fullAadhaar: '2235 1313 2450',
+    dob: '2006-02-25',
+    gender: 'Male',
+    job: 'salaried',
+    income: 85000,
+    dep: 1,
+    cibilScore: 785,
+    loanAmount: 500000,
+    loanTenure: 36,
+    expectedOutcome: 'APPROVED',
+    description: 'Prime CIBIL 785, Salaried ₹85k, clean DigiLocker documents, 98.8% face match -> Straight-through Approval.'
+  },
+  NEED_VERIFICATION: {
+    key: 'NEED_VERIFICATION',
+    title: '2. Need Verification Profile',
+    badge: 'Borderline / Manual Review',
+    badgeColor: 'bg-amber-100 text-amber-800 border-amber-300',
+    name: 'Jeeva B',
+    pan: 'DELPJ9476P',
+    maskedAadhaar: 'XXXXXXXX8901',
+    fullAadhaar: '4567 8901 2345',
+    dob: '2006-02-25',
+    gender: 'Male',
+    job: 'self_employed',
+    income: 42000,
+    dep: 2,
+    cibilScore: 662,
+    loanAmount: 350000,
+    loanTenure: 24,
+    expectedOutcome: 'NEEDS_REVIEW',
+    description: 'Fair CIBIL 662, Self-Employed ₹42k, slight name disparity ("Jeeva B" vs "Jeeva Bharathi M") -> Flagged for Underwriter Review.'
+  },
+  REJECTED: {
+    key: 'REJECTED',
+    title: '3. Loan Rejected Profile',
+    badge: 'High Risk / KYC Mismatch',
+    badgeColor: 'bg-rose-100 text-rose-800 border-rose-300',
+    name: 'Karthik Raman',
+    pan: 'XYZKL9999P',
+    maskedAadhaar: 'XXXXXXXX9999',
+    fullAadhaar: '9876 5432 1098',
+    dob: '2004-11-10',
+    gender: 'Male',
+    job: 'not_employed',
+    income: 18000,
+    dep: 3,
+    cibilScore: 535,
+    loanAmount: 700000,
+    loanTenure: 48,
+    expectedOutcome: 'REJECTED',
+    description: 'Subprime CIBIL 535, Low income ₹18k, DTI 82% (>50% limit), identity number mismatch -> Rejection.'
+  }
+};
+
+export const pullDigiLockerDocsApi = async (applicationId: string, profileKey: string = 'APPROVED') => {
+  const selectedProfile = SAMPLE_DEMO_PROFILES[profileKey] || SAMPLE_DEMO_PROFILES.APPROVED;
   try {
-    const res = await apiClient.post('/digilocker/pull-documents', { applicationId, consentGiven: true });
+    const res = await apiClient.post('/digilocker/pull-documents', { applicationId, consentGiven: true, profileKey });
     return res.data;
   } catch {
     return {
       success: true,
       mode: 'demo',
-      message: 'Retrieved 2 issuer documents via DigiLocker. (DEMO — NOT OFFICIALLY VERIFIED)',
+      message: `Retrieved 2 issuer documents via DigiLocker for ${selectedProfile.name}. (DEMO — NOT OFFICIALLY VERIFIED)`,
       documents: [
         {
-          docId: 'DOC-DL-PAN-DEMO',
+          docId: `DOC-DL-PAN-${selectedProfile.pan}`,
           documentType: 'PAN',
           issuerName: 'Income Tax Department, Govt of India',
           isIssuerAuthenticated: true,
           verificationStatus: 'DEMO_UNVERIFIED',
           labelTag: 'DEMO — NOT OFFICIALLY VERIFIED',
           fields: {
-            panNumber: 'ABCDE1234F',
-            fullName: 'Arjun Sharma',
-            dateOfBirth: '1994-05-14',
-            status: 'Active / Validated in NSDL Registry (Simulated)',
+            panNumber: selectedProfile.pan,
+            fullName: selectedProfile.name,
+            dateOfBirth: selectedProfile.dob,
+            status: 'Active / Validated in Income Tax NSDL Registry (Simulated)',
           },
         },
         {
-          docId: 'DOC-DL-AADHAAR-DEMO',
+          docId: `DOC-DL-AADHAAR-${selectedProfile.maskedAadhaar.slice(-4)}`,
           documentType: 'AADHAAR',
           issuerName: 'Unique Identification Authority of India (UIDAI)',
           isIssuerAuthenticated: true,
           verificationStatus: 'DEMO_UNVERIFIED',
           labelTag: 'DEMO — NOT OFFICIALLY VERIFIED',
           fields: {
-            maskedAadhaar: 'XXXXXXXX8912',
-            fullName: 'Arjun Sharma',
-            gender: 'MALE',
-            address: '402, Shanti Heights, MG Road, Bengaluru, Karnataka - 560001',
+            maskedAadhaar: selectedProfile.maskedAadhaar,
+            fullAadhaar: selectedProfile.fullAadhaar,
+            fullName: selectedProfile.name,
+            gender: selectedProfile.gender,
+            address: 'Tamil Nadu, India',
           },
         },
       ],
       verifiedCount: 2,
       pendingCount: 0,
+      profile: selectedProfile,
     };
   }
 };

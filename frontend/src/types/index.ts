@@ -232,6 +232,12 @@ export interface DocumentItemState {
   verificationStatus: 'NOT_VERIFIED' | 'NEEDS_REVIEW' | 'VERIFIED' | 'FAILED';
   extractedFields: Record<string, any>;
   errorMessage?: string;
+  typeWarning?: string;
+  digiLockerMatch?: {
+    verified: boolean;
+    status: 'MATCHED' | 'MISMATCH' | 'NOT_CHECKED';
+    message: string;
+  };
 }
 
 export interface BiometricCrossCheckResult {
@@ -262,7 +268,7 @@ export interface OcrFieldMatch {
 
 export interface OcrProfileCrossCheckResponse {
   success: boolean;
-  overallMatchStatus: 'EXACT_MATCH' | 'HIGH_CONFIDENCE_MATCH' | 'MISMATCH';
+  overallMatchStatus: 'EXACT_MATCH' | 'HIGH_CONFIDENCE_MATCH' | 'FUZZY_MATCH' | 'MISMATCH';
   overallConfidenceScore: number;
   fieldMatches: OcrFieldMatch[];
   aadhaarExtracted: Record<string, any>;

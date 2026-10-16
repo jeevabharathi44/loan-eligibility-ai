@@ -78,7 +78,24 @@ async def pull_documents(
     token_res = await provider.exchange_token("auth_code_sample", "state_sample")
     token = token_res.get("access_token", "sample_token")
 
-    issued_docs = await provider.fetch_issued_documents(token, app.id)
+    # Detect profile key from request or user name
+    profile_key = "APPROVED"
+    if hasattr(req, "profileKey") and getattr(req, "profileKey"):
+        profile_key = req.profileKey
+    elif current_user.name and "karthik" in current_user.name.lower():
+        profile_key = "REJECTED"
+    elif current_user.name and current_user.name.strip() in ["Jeeva B", "Jeeva"]:
+        profile_key = "NEED_VERIFICATION"
+
+    if hasattr(provider, "fetch_issued_documents"):
+        import inspect
+        sig = inspect.signature(provider.fetch_issued_documents)
+        if "profile_key" in sig.parameters:
+            issued_docs = await provider.fetch_issued_documents(token, app.id, profile_key=profile_key)
+        else:
+            issued_docs = await provider.fetch_issued_documents(token, app.id)
+    else:
+        issued_docs = []
 
     # Persist documents and DigiLocker records
     saved_items: List[DigiLockerItemResponse] = []
@@ -184,3 +201,14 @@ def get_application_digilocker_documents(
             fields=fields
         ))
     return results
+
+
+@router.get("/sample-profiles")
+def get_sample_digilocker_profiles():
+    """Returns the 3 predefined test profiles: Approved, Needs Verification, and Rejected."""
+    from ..adapters.digilocker import DemoDigiLockerProvider
+    return {
+        "success": True,
+        "profiles": DemoDigiLockerProvider.SAMPLE_PROFILES
+    }
+
