@@ -251,7 +251,7 @@ export const TriBiometricGate: React.FC<TriBiometricGateProps> = ({
             Image 3: Live Webcam
           </div>
 
-          <div className="w-32 h-32 rounded-xl overflow-hidden mt-6 bg-white border-2 border-blue-400 relative shadow-inner flex items-center justify-center">
+          <div className="w-36 h-36 rounded-xl overflow-hidden mt-6 bg-slate-900 border-2 border-blue-400 relative shadow-inner flex items-center justify-center">
             {cameraActive ? (
               <div className="relative w-full h-full">
                 <video
@@ -261,20 +261,48 @@ export const TriBiometricGate: React.FC<TriBiometricGateProps> = ({
                   muted
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 border-2 border-dashed border-blue-400 rounded-lg pointer-events-none animate-pulse" />
+                {/* Facial Oval Alignment Reticle */}
+                <div className="absolute inset-2 border-2 border-dashed border-cyan-400 rounded-[50%] pointer-events-none flex items-center justify-center shadow-[0_0_15px_rgba(34,211,238,0.4)]">
+                  <span className="w-1.5 h-1.5 bg-cyan-300 rounded-full absolute top-7 left-9 shadow-[0_0_6px_#22d3ee] animate-ping" />
+                  <span className="w-1.5 h-1.5 bg-cyan-300 rounded-full absolute top-7 right-9 shadow-[0_0_6px_#22d3ee] animate-ping" />
+                  <span className="w-1.5 h-1.5 bg-cyan-300 rounded-full absolute top-14 shadow-[0_0_6px_#22d3ee]" />
+                  <span className="w-3 h-1 bg-cyan-300/80 rounded-full absolute bottom-8 shadow-[0_0_6px_#22d3ee]" />
+                </div>
+                {/* Laser scan line */}
+                <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_10px_#22d3ee] animate-pulse pointer-events-none top-1/2" />
+                <span className="absolute bottom-1 bg-black/75 backdrop-blur-sm text-cyan-300 px-2 py-0.5 rounded text-[8px] font-mono">
+                  Align Face in Oval
+                </span>
               </div>
             ) : capturedPhoto ? (
-              <img src={capturedPhoto} alt="Captured Webcam" className="w-full h-full object-cover" />
+              <div className="relative w-full h-full">
+                <img src={capturedPhoto} alt="Captured Live Frame" className="w-full h-full object-cover" />
+                <span className="absolute bottom-1 right-1 bg-emerald-600/90 text-white px-1.5 py-0.5 rounded text-[8px] font-mono">
+                  Captured
+                </span>
+              </div>
             ) : verificationResult?.live_photo_b64 ? (
-              <img
-                src={verificationResult.live_photo_b64}
-                alt="Live Camera Snapshot"
-                className="w-full h-full object-cover"
-              />
+              <div className="relative w-full h-full">
+                <img
+                  src={verificationResult.live_photo_b64}
+                  alt="Live Camera Snapshot"
+                  className="w-full h-full object-cover"
+                />
+                <span className="absolute bottom-1 right-1 bg-blue-600/90 text-white px-1.5 py-0.5 rounded text-[8px] font-mono">
+                  Verified Frame
+                </span>
+              </div>
             ) : (
-              <div className="flex flex-col items-center justify-center text-blue-600/70 p-2">
-                <Camera className="w-10 h-10 mb-1" />
-                <span className="text-[10px] text-slate-600">Webcam Stream Standby</span>
+              <div className="flex flex-col items-center justify-center text-cyan-400/80 p-2">
+                <Camera className="w-10 h-10 mb-1 animate-pulse" />
+                <span className="text-[10px] text-slate-300">Biometric Sensor Standby</span>
+              </div>
+            )}
+
+            {loading && (
+              <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm flex flex-col items-center justify-center p-2 text-center z-20">
+                <RefreshCw className="w-6 h-6 text-cyan-400 animate-spin mb-1" />
+                <span className="text-[10px] text-white font-semibold">Running 3-Way Match...</span>
               </div>
             )}
           </div>
@@ -282,25 +310,49 @@ export const TriBiometricGate: React.FC<TriBiometricGateProps> = ({
           <canvas ref={canvasRef} className="hidden" />
 
           {/* Camera Controls */}
-          <div className="mt-3 flex items-center gap-2">
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5">
             {!cameraActive ? (
-              <button
-                type="button"
-                onClick={startCamera}
-                className="px-2.5 py-1 bg-blue-50 text-blue-600 border border-blue-300 rounded-lg text-[11px] font-semibold hover:bg-blue-50 transition-colors flex items-center gap-1"
-              >
-                <Camera className="w-3 h-3 text-blue-600" />
-                <span>Open Live Camera</span>
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={startCamera}
+                  className="px-2.5 py-1 bg-blue-50 text-blue-600 border border-blue-300 rounded-lg text-[11px] font-semibold hover:bg-blue-100 transition-colors flex items-center gap-1 shadow-sm"
+                >
+                  <Camera className="w-3.5 h-3.5 text-blue-600" />
+                  <span>{capturedPhoto ? 'Retake Live Face' : 'Open Live Camera'}</span>
+                </button>
+                {capturedPhoto && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCapturedPhoto(null);
+                      setVerificationResult(null);
+                    }}
+                    className="px-2 py-1 bg-slate-100 text-slate-600 hover:text-slate-900 rounded-lg text-[11px] font-medium"
+                  >
+                    Reset
+                  </button>
+                )}
+              </>
             ) : (
-              <button
-                type="button"
-                onClick={captureAndVerify}
-                className="px-2.5 py-1 bg-ok text-white rounded-lg text-[11px] font-bold hover:opacity-90 transition-colors flex items-center gap-1 shadow-lg"
-              >
-                <Camera className="w-3 h-3 text-white" />
-                <span>Capture & Verify Face</span>
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={captureAndVerify}
+                  disabled={loading}
+                  className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[11px] font-bold transition-all flex items-center gap-1.5 shadow-md animate-pulse disabled:opacity-50"
+                >
+                  <Camera className="w-3.5 h-3.5 text-white" />
+                  <span>Capture & Verify Face</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={stopCamera}
+                  className="px-2 py-1.5 bg-slate-200 text-slate-700 hover:bg-slate-300 rounded-lg text-[10px]"
+                >
+                  Cancel
+                </button>
+              </div>
             )}
           </div>
           <div className="text-[10px] text-slate-400 mt-1">Active Liveness Sensor</div>
@@ -400,34 +452,67 @@ export const TriBiometricGate: React.FC<TriBiometricGateProps> = ({
             </div>
           </div>
 
-          {/* Pairwise Breakdown Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs mb-3">
+          {/* Pairwise Breakdown Cards with Progress Bars */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs mb-2">
             {verificationResult.pairs &&
               Object.entries(verificationResult.pairs).map(([key, pair]: [string, any]) => (
                 <div
                   key={key}
-                  className="bg-white rounded-lg p-2.5 border border-slate-200 flex items-center justify-between"
+                  className="bg-white rounded-lg p-2.5 border border-slate-200 flex flex-col justify-between shadow-xs"
                 >
-                  <span className="text-slate-600 font-medium">{pair.pair_name}</span>
-                  <span
-                    className={`font-mono font-bold px-1.5 py-0.5 rounded ${
-                      pair.passed
-                        ? 'bg-ok/15 text-ok border border-ok/30'
-                        : 'bg-bad/15 text-bad border border-bad/30'
-                    }`}
-                  >
-                    {pair.similarity_percentage}%
-                  </span>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-slate-700 font-medium text-[11px]">{pair.pair_name}</span>
+                    <span
+                      className={`font-mono font-bold px-1.5 py-0.5 rounded text-[11px] ${
+                        pair.passed
+                          ? 'bg-ok/15 text-ok border border-ok/30'
+                          : 'bg-bad/15 text-bad border border-bad/30'
+                      }`}
+                    >
+                      {pair.similarity_percentage}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        pair.passed ? 'bg-emerald-500' : 'bg-rose-500'
+                      }`}
+                      style={{ width: `${Math.min(100, Math.max(5, pair.similarity_percentage))}%` }}
+                    />
+                  </div>
                 </div>
               ))}
           </div>
 
+          <div className="flex flex-wrap items-center justify-between text-[11px] text-slate-500 mb-3 px-1 gap-2">
+            <span>Model: 0.40(PAN:Live) + 0.35(Aadhaar:Live) + 0.25(Aadhaar:PAN)</span>
+            <span className="font-semibold text-slate-700">RBI DLG Compliance Gate: Minimum ≥ 75.0%</span>
+          </div>
+
           {verificationResult.denial_reason && (
-            <div className="bg-bad/20 border border-bad/50 rounded-lg p-3 text-xs text-bad flex items-start gap-2">
-              <AlertOctagon className="w-4 h-4 text-bad shrink-0 mt-0.5" />
-              <div>
-                <span className="font-bold">Security Denial Reason: </span>
-                {verificationResult.denial_reason}
+            <div className="bg-bad/20 border border-bad/50 rounded-lg p-3 text-xs text-bad flex flex-col gap-2">
+              <div className="flex items-start gap-2">
+                <AlertOctagon className="w-4 h-4 text-bad shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-bold">Security Denial Reason: </span>
+                  {verificationResult.denial_reason}
+                </div>
+              </div>
+              <div className="flex items-center gap-2 mt-1">
+                <button
+                  type="button"
+                  onClick={startCamera}
+                  className="px-2.5 py-1 bg-bad text-white font-semibold rounded-md text-[11px] hover:opacity-90 shadow-xs"
+                >
+                  Retry with Live Camera
+                </button>
+                <button
+                  type="button"
+                  onClick={() => runInstantPersonaVerify(false)}
+                  className="px-2.5 py-1 bg-white border border-bad/40 text-bad font-semibold rounded-md text-[11px] hover:bg-slate-50 shadow-xs"
+                >
+                  Verify via Registered KYC Photo
+                </button>
               </div>
             </div>
           )}
