@@ -8,6 +8,7 @@ import { RegisterPage } from './pages/RegisterPage';
 import { MeriPehchaanSSOPage } from './pages/MeriPehchaanSSOPage';
 import { ApplicationWizardPage } from './pages/ApplicationWizardPage';
 import { ApplicationHistoryPage } from './pages/ApplicationHistoryPage';
+import { ApplicationDetailPage } from './pages/ApplicationDetailPage';
 import { InstitutionalAuditCockpitPage } from './pages/InstitutionalAuditCockpitPage';
 import { ModelPerformancePage } from './pages/ModelPerformancePage';
 
@@ -149,28 +150,52 @@ const CompareView: React.FC<{ navigate: (p: string) => void }> = ({ navigate }) 
   </div>
 );
 
+const getNormalizedPath = (): string => {
+  if (typeof window === 'undefined') return '/';
+  if (window.location.hash) {
+    const h = window.location.hash.replace(/^#/, '');
+    if (h) return h;
+  }
+  let p = window.location.pathname || '/';
+  // Strip repository subpath on GitHub Pages if present
+  p = p.replace(/^\/loan-eligibility-ai\/?/, '/');
+  return p || '/';
+};
+
 const AppRouter: React.FC = () => {
   const { user, isAuthenticated, isLoading, setUserDirectly } = useAuth();
-  const [currentPath, setCurrentPath] = useState<string>(window.location.pathname || '/');
+  const [currentPath, setCurrentPath] = useState<string>(() => getNormalizedPath());
 
   useEffect(() => {
-    const handlePopState = () => {
-      setCurrentPath(window.location.pathname);
+    const handleLocationChange = () => {
+      setCurrentPath(getNormalizedPath());
     };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+    window.addEventListener('popstate', handleLocationChange);
+    window.addEventListener('hashchange', handleLocationChange);
+    return () => {
+      window.removeEventListener('popstate', handleLocationChange);
+      window.removeEventListener('hashchange', handleLocationChange);
+    };
   }, []);
 
   const navigate = (path: string) => {
-    window.history.pushState({}, '', path);
+    // If on GitHub Pages or nested subpath, use hash navigation to avoid 404s
+    if (
+      window.location.hostname.includes('github.io') ||
+      window.location.pathname.includes('/loan-eligibility-ai')
+    ) {
+      window.location.hash = path;
+    } else {
+      window.history.pushState({}, '', path);
+    }
     setCurrentPath(path);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-bg text-slate-500 text-xs">
-        <span className="w-6 h-6 border-2 border-sky-500 border-t-transparent rounded-full animate-spin mr-2" />
+      <div className="min-h-screen flex items-center justify-center bg-white text-slate-500 text-xs">
+        <span className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mr-2" />
         Initializing Loan Eligibility AI session...
       </div>
     );
@@ -178,11 +203,14 @@ const AppRouter: React.FC = () => {
 
   // Routing logic matching screenshot portal
   const renderPage = () => {
-    if (currentPath === '/' || currentPath === '/login') {
+    if (currentPath === '/' || currentPath === '/apply') {
       if (!isAuthenticated) {
         return <LoginPage navigate={navigate} />;
       }
       return <ApplicationWizardPage navigate={navigate} />;
+    }
+    if (currentPath === '/login') {
+      return <LoginPage navigate={navigate} />;
     }
     if (currentPath === '/landing') {
       return <LandingPage navigate={navigate} />;
@@ -204,9 +232,6 @@ const AppRouter: React.FC = () => {
         />
       );
     }
-    if (currentPath === '/apply') {
-      return <ApplicationWizardPage navigate={navigate} />;
-    }
     if (currentPath === '/history') {
       return <ApplicationHistoryPage navigate={navigate} />;
     }
@@ -216,8 +241,12 @@ const AppRouter: React.FC = () => {
     if (currentPath === '/model-metrics') {
       return <ModelPerformancePage navigate={navigate} />;
     }
+    if (currentPath.startsWith('/applications/')) {
+      const appId = currentPath.replace('/applications/', '') || '';
+      return <ApplicationDetailPage id={appId} navigate={navigate} />;
+    }
 
-    return <LoginPage navigate={navigate} />;
+    return <ApplicationWizardPage navigate={navigate} />;
   };
 
   return (

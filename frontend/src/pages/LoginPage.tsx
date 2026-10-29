@@ -8,9 +8,9 @@ interface LoginPageProps {
 
 export const LoginPage: React.FC<LoginPageProps> = ({ navigate }) => {
   const { login } = useAuth();
-  const [email, setEmail] = useState('arjun@loanai.local');
+  const [email, setEmail] = useState('jeeva.bharathi@fintech.gov.in');
   const [password, setPassword] = useState('User@12345');
-  const [error, setError] = useState('Authentication failed. Please verify credentials.');
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -20,24 +20,47 @@ export const LoginPage: React.FC<LoginPageProps> = ({ navigate }) => {
 
     try {
       await login(email, password);
-      navigate('/apply');
+      const isOfficer = email.toLowerCase().includes('admin') || email.toLowerCase().includes('officer') || email.toLowerCase().includes('90421');
+      if (isOfficer) {
+        navigate('/admin');
+      } else {
+        navigate('/apply');
+      }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Authentication failed. Please verify credentials.');
+      setError(err.response?.data?.message || err.message || 'Authentication failed. Please verify credentials.');
     } finally {
       setLoading(false);
     }
   };
 
-  const fillDemoUser = () => {
-    setEmail('arjun@loanai.local');
+  const fillDemoUser = async () => {
+    setEmail('jeeva.bharathi@fintech.gov.in');
     setPassword('User@12345');
     setError('');
+    setLoading(true);
+    try {
+      await login('jeeva.bharathi@fintech.gov.in', 'User@12345');
+      navigate('/apply');
+    } catch (err: any) {
+      setError(err.message || 'Login failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const fillDemoAdmin = () => {
-    setEmail('admin@loanai.local');
+  const fillDemoAdmin = async () => {
+    setEmail('officer.varman@rbi.gov.in');
     setPassword('Admin@12345');
     setError('');
+    setLoading(true);
+    try {
+      await login('officer.varman@rbi.gov.in', 'Admin@12345');
+      navigate('/admin');
+    } catch (err: any) {
+      setError(err.message || 'Login failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -61,16 +84,16 @@ export const LoginPage: React.FC<LoginPageProps> = ({ navigate }) => {
             <button
               type="button"
               onClick={fillDemoUser}
-              className="flex-1 py-1.5 px-3 rounded-lg bg-white border border-slate-200 hover:border-slate-300 text-xs text-slate-700 transition-all font-medium shadow-none"
+              className="flex-1 py-1.5 px-3 rounded-lg bg-white border border-slate-200 hover:border-slate-300 text-xs text-slate-700 transition-all font-medium shadow-none hover:bg-slate-50"
             >
-              Demo User (Arjun)
+              Demo User (Jeeva Bharathi)
             </button>
             <button
               type="button"
               onClick={fillDemoAdmin}
-              className="flex-1 py-1.5 px-3 rounded-lg bg-white border border-slate-200 hover:border-amber-300 text-xs text-amber-600 transition-all font-medium shadow-none"
+              className="flex-1 py-1.5 px-3 rounded-lg bg-white border border-slate-200 hover:border-amber-300 text-xs text-amber-600 transition-all font-medium shadow-none hover:bg-amber-50/50"
             >
-              Demo Admin
+              Chief Underwriter (Dr. Varman)
             </button>
           </div>
         </div>
