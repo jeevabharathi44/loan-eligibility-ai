@@ -210,19 +210,19 @@ def evaluate_tri_biometric_verification(
             "is_gate_passed": False,
             "pairs": {
                 "aadhaar_pan": {
-                    "pair_name": "Aadhaar Registry ⟷ PAN Card",
+                    "pair_name": "Aadhaar Registry <-> PAN Card",
                     "similarity_percentage": 94.2,
                     "threshold": threshold,
                     "passed": True
                 },
                 "aadhaar_live": {
-                    "pair_name": "Aadhaar Registry ⟷ Live Webcam",
+                    "pair_name": "Aadhaar Registry <-> Live Webcam",
                     "similarity_percentage": 42.5,
                     "threshold": threshold,
                     "passed": False
                 },
                 "pan_live": {
-                    "pair_name": "PAN Card ⟷ Live Webcam",
+                    "pair_name": "PAN Card <-> Live Webcam",
                     "similarity_percentage": 44.1,
                     "threshold": threshold,
                     "passed": False
@@ -253,19 +253,19 @@ def evaluate_tri_biometric_verification(
                 "is_gate_passed": False,
                 "pairs": {
                     "aadhaar_pan": {
-                        "pair_name": "Aadhaar Registry ⟷ PAN Card",
+                        "pair_name": "Aadhaar Registry <-> PAN Card",
                         "similarity_percentage": 99.3,
                         "threshold": threshold,
                         "passed": True
                     },
                     "aadhaar_live": {
-                        "pair_name": "Aadhaar Registry ⟷ Live Webcam",
+                        "pair_name": "Aadhaar Registry <-> Live Webcam",
                         "similarity_percentage": 10.5,
                         "threshold": threshold,
                         "passed": False
                     },
                     "pan_live": {
-                        "pair_name": "PAN Card ⟷ Live Webcam",
+                        "pair_name": "PAN Card <-> Live Webcam",
                         "similarity_percentage": 12.0,
                         "threshold": threshold,
                         "passed": False
@@ -326,19 +326,19 @@ def evaluate_tri_biometric_verification(
         "is_gate_passed": is_passed,
         "pairs": {
             "aadhaar_pan": {
-                "pair_name": "Aadhaar Registry ⟷ PAN Card",
+                "pair_name": "Aadhaar Registry <-> PAN Card",
                 "similarity_percentage": sim_aadhaar_pan,
                 "threshold": threshold,
                 "passed": sim_aadhaar_pan >= threshold
             },
             "aadhaar_live": {
-                "pair_name": "Aadhaar Registry ⟷ Live Webcam",
+                "pair_name": "Aadhaar Registry <-> Live Webcam",
                 "similarity_percentage": sim_aadhaar_live,
                 "threshold": threshold,
                 "passed": sim_aadhaar_live >= threshold
             },
             "pan_live": {
-                "pair_name": "PAN Card ⟷ Live Webcam",
+                "pair_name": "PAN Card <-> Live Webcam",
                 "similarity_percentage": sim_pan_live,
                 "threshold": threshold,
                 "passed": sim_pan_live >= threshold

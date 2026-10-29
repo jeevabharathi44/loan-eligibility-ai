@@ -25,14 +25,16 @@ def verify_tri_biometric(payload: TriBiometricVerifyRequest):
     Mismatches automatically trigger immediate security denial.
     """
     persona_id = payload.persona_id
-    aadhaar_photo = None
-    pan_photo = None
+    aadhaar_photo = payload.aadhaar_photo_b64
+    pan_photo = payload.pan_photo_b64
     live_photo = payload.live_webcam_image_b64
     
     if persona_id:
         p = get_persona_by_id(persona_id)
-        aadhaar_photo = p["aadhaar_photo"]
-        pan_photo = p["pan_photo"]
+        if not aadhaar_photo:
+            aadhaar_photo = p["aadhaar_photo"]
+        if not pan_photo:
+            pan_photo = p["pan_photo"]
         if not live_photo:
             live_photo = p["live_photo"]
             

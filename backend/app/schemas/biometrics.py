@@ -5,7 +5,9 @@ class TriBiometricVerifyRequest(BaseModel):
     application_id: Optional[str] = None
     user_id: Optional[str] = None
     persona_id: Optional[str] = None
-    live_webcam_image_b64: Optional[str] = None # Captured webcam snapshot
+    aadhaar_photo_b64: Optional[str] = None # Custom uploaded or reference Aadhaar photo
+    pan_photo_b64: Optional[str] = None # Custom uploaded or reference PAN photo
+    live_webcam_image_b64: Optional[str] = None # Captured webcam snapshot or uploaded live selfie
     liveness_challenge_response: Optional[str] = None # Challenge token/action confirmed
     force_spoof_simulation: Optional[bool] = False
 
