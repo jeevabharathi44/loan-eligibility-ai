@@ -28,7 +28,7 @@ export const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 4000,
+  timeout: 3000,
 });
 
 apiClient.interceptors.request.use((config) => {
@@ -175,29 +175,50 @@ export const MOCK_PERSONAS = [
 ];
 
 // ============================================================================
-// INITIAL SEED APPLICATIONS (STORED & PERSISTED IN LOCALSTORAGE)
+// INITIAL SEED APPLICATIONS (PERSISTED IN LOCALSTORAGE)
 // ============================================================================
-export const INITIAL_MOCK_APPLICATIONS: LoanApplication[] = [
+export const INITIAL_MOCK_APPLICATIONS: any[] = [
   {
     id: 'APP-2026-0841',
+    application_no: 'APP-2026-0841',
     userId: 'usr-jeeva-prime',
+    applicant_name: 'Jeeva Bharathi M',
     user: {
       id: 'usr-jeeva-prime',
       name: 'Jeeva Bharathi M',
       email: 'jeeva.bharathi@fintech.gov.in',
     },
     income: 95000,
+    monthly_income: 95000,
     employmentType: 'salaried',
+    employment_type: 'salaried',
     age: 20,
     dependents: 1,
     loanAmount: 500000,
+    requested_amount: 500000,
     loanTenure: 36,
+    tenure_months: 36,
     loanPurpose: 'personal',
+    loan_purpose: 'personal',
     existingLoans: 1,
+    existing_loans: 1,
     monthlyObligations: 8000,
+    monthly_obligations: 8000,
     status: 'APPROVED',
+    system_decision: 'APPROVED',
+    final_decision: 'APPROVED',
+    risk_tier: 'LOW',
+    probability_percentage: 94.2,
+    cibil_score: 785,
+    calculated_emi: 16254,
+    debt_to_income_ratio: 25.5,
+    loan_to_income_ratio: 0.44,
+    is_officer_overridden: false,
     createdAt: '2026-10-29T10:30:00Z',
+    created_at: '2026-10-29T10:30:00Z',
     updatedAt: '2026-10-29T10:32:15Z',
+    decision_summary: 'Strong credit profile with prime CIBIL band, low debt obligations, and flawless verified e-KYC credentials.',
+    decision_reasons: ['Prime CIBIL credit score of 785', 'Low revolving credit utilization at 18%', 'Comfortable Debt-to-Income buffer at 25.5% (Limit: 50%)'],
     creditProfile: {
       id: 'CRD-1001',
       applicationId: 'APP-2026-0841',
@@ -238,24 +259,45 @@ export const INITIAL_MOCK_APPLICATIONS: LoanApplication[] = [
   },
   {
     id: 'APP-2026-0792',
+    application_no: 'APP-2026-0792',
     userId: 'usr-jeeva-review',
+    applicant_name: 'Jeeva B',
     user: {
       id: 'usr-jeeva-review',
       name: 'Jeeva B',
       email: 'jeeva.consulting@enterprise.in',
     },
     income: 60000,
+    monthly_income: 60000,
     employmentType: 'salaried',
+    employment_type: 'salaried',
     age: 20,
     dependents: 2,
     loanAmount: 400000,
+    requested_amount: 400000,
     loanTenure: 36,
+    tenure_months: 36,
     loanPurpose: 'business',
+    loan_purpose: 'business',
     existingLoans: 2,
+    existing_loans: 2,
     monthlyObligations: 14000,
+    monthly_obligations: 14000,
     status: 'NEEDS_REVIEW',
+    system_decision: 'NEEDS_REVIEW',
+    final_decision: 'NEEDS_REVIEW',
+    risk_tier: 'MODERATE',
+    probability_percentage: 56.4,
+    cibil_score: 680,
+    calculated_emi: 13003,
+    debt_to_income_ratio: 46.5,
+    loan_to_income_ratio: 0.55,
+    is_officer_overridden: false,
     createdAt: '2026-10-28T14:20:00Z',
+    created_at: '2026-10-28T14:20:00Z',
     updatedAt: '2026-10-28T14:25:00Z',
+    decision_summary: 'Near-prime application requiring institutional chief underwriter exception review.',
+    decision_reasons: ['Elevated Debt-to-Income (DTI) ratio at 46.5%', 'Minor name variation detected between Aadhaar XML and PAN Master', 'Score falls within near-prime exception approval policy band'],
     creditProfile: {
       id: 'CRD-1002',
       applicationId: 'APP-2026-0792',
@@ -292,24 +334,45 @@ export const INITIAL_MOCK_APPLICATIONS: LoanApplication[] = [
   },
   {
     id: 'APP-2026-0648',
+    application_no: 'APP-2026-0648',
     userId: 'usr-karthik',
+    applicant_name: 'Karthik Raman',
     user: {
       id: 'usr-karthik',
       name: 'Karthik Raman',
       email: 'karthik.raman@startup.in',
     },
     income: 32000,
+    monthly_income: 32000,
     employmentType: 'self_employed',
+    employment_type: 'self_employed',
     age: 28,
     dependents: 3,
     loanAmount: 800000,
+    requested_amount: 800000,
     loanTenure: 36,
+    tenure_months: 36,
     loanPurpose: 'personal',
+    loan_purpose: 'personal',
     existingLoans: 4,
+    existing_loans: 4,
     monthlyObligations: 22000,
+    monthly_obligations: 22000,
     status: 'DECLINED',
+    system_decision: 'DECLINED',
+    final_decision: 'DECLINED',
+    risk_tier: 'HIGH',
+    probability_percentage: 5.0,
+    cibil_score: 540,
+    calculated_emi: 26006,
+    debt_to_income_ratio: 117.2,
+    loan_to_income_ratio: 2.08,
+    is_officer_overridden: false,
     createdAt: '2026-10-27T09:15:00Z',
+    created_at: '2026-10-27T09:15:00Z',
     updatedAt: '2026-10-27T09:18:00Z',
+    decision_summary: 'Loan policy declined due to debt-to-income capacity limits and elevated credit default risk.',
+    decision_reasons: ['Debt-to-Income (DTI) of 117.2% exceeds RBI prudential cap (55.0%)', 'CIBIL score of 540 falls into subprime credit risk tier'],
     creditProfile: {
       id: 'CRD-1003',
       applicationId: 'APP-2026-0648',
@@ -345,7 +408,7 @@ export const INITIAL_MOCK_APPLICATIONS: LoanApplication[] = [
   },
 ];
 
-const getStoredApplications = (): LoanApplication[] => {
+const getStoredApplications = (): any[] => {
   try {
     const raw = localStorage.getItem('loan_xai_applications');
     if (raw) {
@@ -359,7 +422,7 @@ const getStoredApplications = (): LoanApplication[] => {
   return INITIAL_MOCK_APPLICATIONS;
 };
 
-const saveStoredApplications = (apps: LoanApplication[]) => {
+const saveStoredApplications = (apps: any[]) => {
   try {
     localStorage.setItem('loan_xai_applications', JSON.stringify(apps));
   } catch (e) {
@@ -376,7 +439,7 @@ export const requestMobileOtpApi = async (mobile: string) => {
       const res = await apiClient.post('/auth/digilocker/mobile-otp', { mobile });
       return res.data;
     } catch (e) {
-      console.warn('API /auth/digilocker/mobile-otp failed, using client fallback');
+      console.warn('API /auth/digilocker/mobile-otp fallback');
     }
   }
   return {
@@ -393,7 +456,7 @@ export const verifyMobileOtpApi = async (mobile: string, otp: string) => {
       const res = await apiClient.post('/auth/digilocker/verify-otp', { mobile, otp });
       return res.data;
     } catch (e) {
-      console.warn('API /auth/digilocker/verify-otp failed, using client fallback');
+      console.warn('API /auth/digilocker/verify-otp fallback');
     }
   }
   return {
@@ -415,7 +478,7 @@ export const signinUsernamePinApi = async (username: string, pin: string) => {
       const res = await apiClient.post('/auth/digilocker/username-pin', { username, pin });
       return res.data;
     } catch (e) {
-      console.warn('API /auth/digilocker/username-pin failed, using client fallback');
+      console.warn('API /auth/digilocker/username-pin fallback');
     }
   }
   const isOfficer = username.toLowerCase().includes('admin') || username.toLowerCase().includes('officer') || username.toLowerCase().includes('90421');
@@ -442,7 +505,7 @@ export const signinOtherIdApi = async (idType: string, idNumber: string) => {
       });
       return res.data;
     } catch (e) {
-      console.warn('API /auth/digilocker/other-id failed, using client fallback');
+      console.warn('API /auth/digilocker/other-id fallback');
     }
   }
   return {
@@ -469,7 +532,7 @@ export const getDemoPersonasApi = async () => {
         return res.data;
       }
     } catch (e) {
-      console.warn('API /personas failed, using client fallback');
+      console.warn('API /personas fallback');
     }
   }
   return MOCK_PERSONAS;
@@ -479,40 +542,59 @@ export const getPersonaKycApi = async (personaId: string) => {
   if (!isStaticDeployment()) {
     try {
       const res = await apiClient.get(`/kyc/persona-kyc/${personaId}`);
-      return res.data;
+      if (res.data?.e_aadhaar_xml?.demographics) {
+        return res.data;
+      }
     } catch (e) {
-      console.warn('API /kyc/persona-kyc failed, using client fallback');
+      console.warn('API /kyc/persona-kyc fallback');
     }
   }
+
   const persona = MOCK_PERSONAS.find((p) => p.id === personaId) || MOCK_PERSONAS[0];
+
+  const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+<KycRes ts="${new Date().toISOString()}" txn="UKC:DEMO9184" ret="Y" code="1">
+  <UidData>
+    <Poi dob="${persona.dob}" g="${persona.gender}" n="${persona.aadhaar_name}" />
+    <Poa country="India" dist="Chennai" loc="Guindy" pc="600025" state="Tamil Nadu" street="Anna Salai" vt="Chennai" />
+  </UidData>
+  <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+    <SignedInfo><SignatureMethod Algorithm="rsa-sha256" /></SignedInfo>
+    <SignatureValue>SIG:DEMO:UIDAI:9184...</SignatureValue>
+    <KeyInfo><X509Data><X509SubjectName>CN=DS UNIQUE IDENTIFICATION AUTHORITY OF INDIA 04</X509SubjectName></X509Data></KeyInfo>
+  </Signature>
+</KycRes>`;
+
   return {
     persona_id: persona.id,
-    aadhaar: {
-      aadhaar_number: persona.aadhaar_masked,
-      name: persona.aadhaar_name,
-      dob: persona.dob,
-      gender: persona.gender,
-      address: persona.address,
-      xml_digital_signature: {
-        verified: true,
-        issuer: 'DS UNIQUE IDENTIFICATION AUTHORITY OF INDIA 04',
-        timestamp: new Date().toISOString(),
+    applicant_name: persona.name,
+    e_aadhaar_xml: {
+      txn_id: 'UKC:DEMO9184',
+      timestamp: new Date().toISOString(),
+      xml_raw: xmlContent,
+      sha256_hash: '9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b',
+      cert_cn: 'DS UNIQUE IDENTIFICATION AUTHORITY OF INDIA 04',
+      is_signature_valid: true,
+      demographics: {
+        uid_masked: persona.aadhaar_masked,
+        name: persona.aadhaar_name,
+        dob: persona.dob,
+        gender: persona.gender,
+        address: persona.address,
       },
-      photo_b64: persona.aadhaar_photo,
     },
-    pan: {
-      pan_number: persona.pan_number,
-      name: persona.pan_name,
-      father_name: persona.father_name,
+    itd_pan_master: {
+      pan: persona.pan_number,
+      name_on_card: persona.pan_name,
       dob: persona.dob,
-      status: 'OPERATIVE_AADHAAR_LINKED',
-      digital_verification: {
-        verified: true,
-        source: 'INCOME TAX DEPARTMENT NSDL / UTIITSL MASTER DATABASE',
-        timestamp: new Date().toISOString(),
-      },
-      photo_b64: persona.pan_photo,
+      pan_status: 'OPERATIVE_AADHAAR_LINKED',
+      taxpayer_category: 'INDIVIDUAL',
+      itd_match_status: true,
+      ao_code: 'CHE/W/12/3',
+      last_updated: '2026-03-31T00:00:00Z',
     },
+    retrieval_status: 'CRYPTOGRAPHICALLY_VERIFIED',
+    cert_status: 'VALID_UIDAI_CA',
   };
 };
 
@@ -528,47 +610,63 @@ export const checkOcrConsistencyApi = async (data: {
   if (!isStaticDeployment()) {
     try {
       const res = await apiClient.post('/kyc/ocr-cross-check', data);
-      return res.data;
+      if (res.data?.fields) {
+        return res.data;
+      }
     } catch (e) {
-      console.warn('API /kyc/ocr-cross-check failed, using client fallback');
+      console.warn('API /kyc/ocr-cross-check fallback');
     }
   }
 
   const name1 = (data.aadhaar_name || '').trim().toLowerCase();
   const name2 = (data.pan_name || '').trim().toLowerCase();
   const isMatch = name1 === name2;
-  const isDiscrepancy = !isMatch && (name1.includes(name2) || name2.includes(name1) || (name1.length > 5 && name2.length > 5 && name1[0] === name2[0]));
+  const isDiscrepancy = !isMatch && (name1.includes(name2) || name2.includes(name1) || (name1.length > 3 && name2.length > 3 && name1[0] === name2[0]));
 
   const status = isMatch ? 'MATCH' : isDiscrepancy ? 'DISCREPANCY_FLAG' : 'MISMATCH';
-  const sim = isMatch ? 100.0 : isDiscrepancy ? 68.0 : 42.0;
+  const nameSim = isMatch ? 100.0 : isDiscrepancy ? 68.0 : 42.0;
+  const overallSim = isMatch ? 100.0 : isDiscrepancy ? 84.0 : 58.0;
+  const dist = isMatch ? 0 : isDiscrepancy ? 5 : 12;
 
   return {
     status,
-    name_similarity: sim,
-    panStatusVerified: true,
-    aadhaarXmlSignatureValid: true,
-    discrepancy_count: isMatch ? 0 : 1,
+    overall_similarity: overallSim,
+    name_similarity: nameSim,
+    name_levenshtein_distance: dist,
+    requires_officer_review: status !== 'MATCH',
+    review_reason: isMatch ? null : isDiscrepancy ? 'Minor name spelling/initial variation flagged between Aadhaar and PAN documents' : 'Critical identity mismatch detected across submitted credentials',
+    pan_status_verified: true,
+    aadhaar_xml_signature_valid: true,
     fields: [
       {
-        field: 'Legal Name',
+        field_name: 'Full Legal Name',
         aadhaar_value: data.aadhaar_name,
         pan_value: data.pan_name,
-        match_score: sim,
-        status: status,
+        declared_value: data.declared_name || data.aadhaar_name,
+        is_match: isMatch,
+        levenshtein_distance: dist,
+        similarity_percentage: nameSim,
+        flag_type: isMatch ? 'MATCH' : isDiscrepancy ? 'MINOR_DISCREPANCY' : 'CRITICAL_MISMATCH',
       },
       {
-        field: 'Date of Birth',
+        field_name: 'Date of Birth (DOB)',
         aadhaar_value: data.aadhaar_dob,
         pan_value: data.pan_dob,
-        match_score: 100.0,
-        status: 'MATCH',
+        declared_value: data.declared_dob || data.aadhaar_dob,
+        is_match: true,
+        levenshtein_distance: 0,
+        similarity_percentage: 100.0,
+        flag_type: 'MATCH',
       },
       {
-        field: 'PAN Document Format',
-        aadhaar_value: 'N/A',
+        field_name: 'Permanent Account Number (PAN)',
+        aadhaar_value: 'N/A (Linked)',
         pan_value: data.pan_number,
-        match_score: 100.0,
-        status: 'MATCH',
+        declared_value: data.pan_number,
+        is_match: true,
+        levenshtein_distance: 0,
+        similarity_percentage: 100.0,
+        flag_type: 'MATCH',
       },
     ],
   };
@@ -581,12 +679,13 @@ export const getLivenessChallengeApi = async () => {
   if (!isStaticDeployment()) {
     try {
       const res = await apiClient.get('/biometrics/liveness-challenge');
-      return res.data;
+      if (res.data?.instruction) return res.data;
     } catch (e) {
-      console.warn('API /biometrics/liveness-challenge failed, using client fallback');
+      console.warn('API /biometrics/liveness-challenge fallback');
     }
   }
   return {
+    challenge_id: 'BLINK_EYES',
     challenge_type: 'BLINK_EYES',
     instruction: 'Please look directly at camera and blink naturally',
     challenge_token: 'CHLG-' + Math.floor(1000 + Math.random() * 9000),
@@ -602,39 +701,58 @@ export const verifyTriBiometricApi = async (payload: {
   if (!isStaticDeployment()) {
     try {
       const res = await apiClient.post('/biometrics/verify-tri-biometric', payload);
-      return res.data;
+      if (res.data && res.data.composite_similarity !== undefined) {
+        return res.data;
+      }
     } catch (e) {
-      console.warn('API /biometrics/verify-tri-biometric failed, using client fallback');
+      console.warn('API /biometrics/verify-tri-biometric fallback');
     }
   }
 
   const persona = MOCK_PERSONAS.find((p) => p.id === payload.persona_id) || MOCK_PERSONAS[0];
+  const isDenied = payload.force_spoof_simulation || persona.id === 'karthik_raman';
 
-  if (payload.force_spoof_simulation || persona.id === 'karthik_raman') {
+  if (isDenied) {
     return {
+      is_gate_passed: false,
       passed: false,
+      composite_similarity: 42.5,
       compositeSimilarity: 42.5,
-      aadhaarPanSimilarity: 54.0,
-      aadhaarLiveSimilarity: 41.2,
-      panLiveSimilarity: 43.8,
-      livenessScore: 32.1,
+      threshold: 75.0,
       status: 'SECURITY_DENIAL',
-      reason: 'Anti-Spoofing Gate Triggered: Synthetic / Screen artifact detected',
+      denial_reason: 'Anti-Spoofing Gate Triggered: Synthetic / Screen artifact detected',
+      liveness: {
+        liveness_passed: false,
+        confidence: 32.1,
+      },
+      pairs: {
+        aadhaar_pan: { pair_name: 'Aadhaar ⟷ PAN', similarity_percentage: 54.0, passed: false },
+        aadhaar_live: { pair_name: 'Aadhaar ⟷ Live', similarity_percentage: 41.2, passed: false },
+        pan_live: { pair_name: 'PAN ⟷ Live', similarity_percentage: 43.8, passed: false },
+      },
       aadhaar_photo_b64: persona.aadhaar_photo,
       pan_photo_b64: persona.pan_photo,
       live_photo_b64: payload.live_webcam_image_b64 || persona.live_photo,
     };
   }
 
+  const sim = persona.biometric_similarity;
   return {
+    is_gate_passed: true,
     passed: true,
-    compositeSimilarity: persona.biometric_similarity,
-    aadhaarPanSimilarity: 99.3,
-    aadhaarLiveSimilarity: 97.8,
-    panLiveSimilarity: 98.9,
-    livenessScore: 98.4,
+    composite_similarity: sim,
+    compositeSimilarity: sim,
+    threshold: 75.0,
     status: 'PASSED',
-    reason: 'Tri-Biometric 3-way vector similarity exceeded 75.0% compliance threshold',
+    liveness: {
+      liveness_passed: true,
+      confidence: 98.4,
+    },
+    pairs: {
+      aadhaar_pan: { pair_name: 'Aadhaar ⟷ PAN', similarity_percentage: 99.3, passed: true },
+      aadhaar_live: { pair_name: 'Aadhaar ⟷ Live', similarity_percentage: 97.8, passed: true },
+      pan_live: { pair_name: 'PAN ⟷ Live', similarity_percentage: 98.9, passed: true },
+    },
     aadhaar_photo_b64: persona.aadhaar_photo,
     pan_photo_b64: persona.pan_photo,
     live_photo_b64: payload.live_webcam_image_b64 || persona.live_photo,
@@ -648,9 +766,9 @@ export const evaluateUnderwritingApi = async (payload: any) => {
   if (!isStaticDeployment()) {
     try {
       const res = await apiClient.post('/underwriting/evaluate', payload);
-      return res.data;
+      if (res.data?.system_decision) return res.data;
     } catch (e) {
-      console.warn('API /underwriting/evaluate failed, using client fallback');
+      console.warn('API /underwriting/evaluate fallback');
     }
   }
 
@@ -710,11 +828,16 @@ export const evaluateUnderwritingApi = async (payload: any) => {
 
   return {
     system_decision: decision,
+    final_decision: decision,
     risk_tier: riskTier,
+    probability: prob,
     probability_percentage: (prob * 100).toFixed(1),
     decision_summary: summary,
     decision_reasons: reasons,
     intercept,
+    estimated_emi: Math.round(emi),
+    debt_to_income_ratio: parseFloat(dti.toFixed(1)),
+    loan_to_income_ratio: parseFloat(lti.toFixed(2)),
     waterfall_bars: waterfallBars,
     positive_factors: waterfallBars.filter((b) => b.score > 0),
     negative_factors: waterfallBars.filter((b) => b.score < 0),
@@ -728,34 +851,55 @@ export const submitApplicationApi = async (payload: any) => {
   if (!isStaticDeployment()) {
     try {
       const res = await apiClient.post('/applications', payload);
-      return res.data;
+      if (res.data?.system_decision) return res.data;
     } catch (e) {
-      console.warn('API /applications failed, using client fallback');
+      console.warn('API /applications fallback');
     }
   }
 
   const evalResult = await evaluateUnderwritingApi(payload);
   const appId = evalResult.application_id;
 
-  const newApp: LoanApplication = {
+  const newApp: any = {
     id: appId,
+    application_no: appId,
     userId: 'usr-jeeva-prime',
+    applicant_name: payload.name || 'Jeeva Bharathi M',
     user: {
       id: 'usr-jeeva-prime',
       name: payload.name || 'Jeeva Bharathi M',
       email: 'jeeva.bharathi@fintech.gov.in',
     },
     income: payload.income,
+    monthly_income: payload.income,
     employmentType: payload.employment_type || 'salaried',
+    employment_type: payload.employment_type || 'salaried',
     age: payload.age || 20,
     dependents: payload.dependents || 1,
     loanAmount: payload.loan_amount,
+    requested_amount: payload.loan_amount,
     loanTenure: payload.loan_tenure,
+    tenure_months: payload.loan_tenure,
     loanPurpose: payload.loan_purpose || 'personal',
+    loan_purpose: payload.loan_purpose || 'personal',
     existingLoans: payload.existing_loans || 1,
+    existing_loans: payload.existing_loans || 1,
     monthlyObligations: payload.monthly_obligations || 8000,
-    status: evalResult.system_decision as any,
+    monthly_obligations: payload.monthly_obligations || 8000,
+    status: evalResult.system_decision,
+    system_decision: evalResult.system_decision,
+    final_decision: evalResult.system_decision,
+    risk_tier: evalResult.risk_tier,
+    probability_percentage: parseFloat(evalResult.probability_percentage),
+    cibil_score: payload.cibil_score || 785,
+    calculated_emi: evalResult.estimated_emi,
+    debt_to_income_ratio: evalResult.debt_to_income_ratio,
+    loan_to_income_ratio: evalResult.loan_to_income_ratio,
+    is_officer_overridden: false,
+    decision_summary: evalResult.decision_summary,
+    decision_reasons: evalResult.decision_reasons,
     createdAt: new Date().toISOString(),
+    created_at: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     creditProfile: {
       id: 'CRD-' + Math.floor(1000 + Math.random() * 9000),
@@ -814,13 +958,13 @@ export const getApplicationsListApi = async (status?: string) => {
         return res.data;
       }
     } catch (e) {
-      console.warn('API /applications failed, using client fallback');
+      console.warn('API /applications fallback');
     }
   }
 
   const apps = getStoredApplications();
   if (status && status !== 'ALL') {
-    return apps.filter((a) => a.status === status);
+    return apps.filter((a) => a.status === status || a.final_decision === status);
   }
   return apps;
 };
@@ -829,17 +973,48 @@ export const getApplicationDetailApi = async (id: string) => {
   if (!isStaticDeployment()) {
     try {
       const res = await apiClient.get(`/applications/${id}`);
-      return res.data;
+      if (res.data?.application) return res.data;
     } catch (e) {
-      console.warn(`API /applications/${id} failed, using client fallback`);
+      console.warn(`API /applications/${id} fallback`);
     }
   }
 
   const apps = getStoredApplications();
   const app = apps.find((a) => a.id === id) || apps[0];
+  const intercept = 0.15;
+  const waterfallBars = [
+    { feature: 'Base Population Intercept', score: intercept, label: 'Base Intercept', cumulative: intercept },
+    { feature: 'CIBIL Credit Score', score: (app.cibil_score || 750) >= 750 ? 0.42 : -0.25, label: `CIBIL: ${app.cibil_score || 750}`, cumulative: 0.5 },
+    { feature: 'Debt-to-Income (DTI)', score: (app.debt_to_income_ratio || 30) <= 40 ? 0.38 : -0.35, label: `DTI: ${app.debt_to_income_ratio || 30}%`, cumulative: 0.8 },
+  ];
+
   return {
     application: app,
+    ebm_explanation: {
+      intercept,
+      positive_factors: waterfallBars.filter((b) => b.score > 0),
+      negative_factors: waterfallBars.filter((b) => b.score < 0),
+      all_factors: waterfallBars,
+      waterfall_bars: waterfallBars,
+    },
     audit_trail: app.auditLogs || [],
+    disbursement: {
+      nach_umrn: 'UMRN-2026-NACH-914827',
+      bank_name: 'State Bank of India (SBI)',
+      bank_account_masked: 'XXXXXXXX4419',
+      ifsc_code: 'SBIN0001234',
+      mandate_amount_limit: app.loanAmount || 500000,
+      mandate_status: 'ACTIVE_REGISTERED',
+      imps_rrn: '202694827103',
+      imps_utr: 'RBILEND9184729104',
+      disbursement_amount: app.loanAmount || 500000,
+      disbursement_status: 'COMPLETED_SUCCESS',
+      disbursed_at: new Date().toISOString(),
+      kfs_data: {
+        annual_percentage_rate: 10.5,
+        cooling_off_period_days: 3,
+      },
+    },
   };
 };
 
@@ -850,17 +1025,17 @@ export const getCockpitStatsApi = async () => {
   if (!isStaticDeployment()) {
     try {
       const res = await apiClient.get('/audit/cockpit-stats');
-      return res.data;
+      if (res.data?.stats) return res.data;
     } catch (e) {
-      console.warn('API /audit/cockpit-stats failed, using client fallback');
+      console.warn('API /audit/cockpit-stats fallback');
     }
   }
 
   const apps = getStoredApplications();
-  const approved = apps.filter((a) => a.status === 'APPROVED');
-  const needsReview = apps.filter((a) => a.status === 'NEEDS_REVIEW');
-  const declined = apps.filter((a) => a.status === 'DECLINED');
-  const totalDisbursed = approved.reduce((sum, a) => sum + (a.loanAmount || 0), 0);
+  const approved = apps.filter((a) => a.status === 'APPROVED' || a.final_decision === 'APPROVED');
+  const needsReview = apps.filter((a) => a.status === 'NEEDS_REVIEW' || a.final_decision === 'NEEDS_REVIEW');
+  const declined = apps.filter((a) => a.status === 'DECLINED' || a.final_decision === 'DECLINED');
+  const totalDisbursed = approved.reduce((sum, a) => sum + (a.loanAmount || a.requested_amount || 0), 0);
 
   return {
     active_officer: {
@@ -894,9 +1069,9 @@ export const submitOfficerOverrideApi = async (payload: {
         officer_id: 'EMP-90421',
         officer_name: 'Dr. Arulmozhi Varman',
       });
-      return res.data;
+      if (res.data?.success) return res.data;
     } catch (e) {
-      console.warn('API /audit/override failed, using client fallback');
+      console.warn('API /audit/override fallback');
     }
   }
 
@@ -906,15 +1081,21 @@ export const submitOfficerOverrideApi = async (payload: {
       const newStatus = payload.action === 'APPROVE' ? 'APPROVED' : payload.action === 'REJECT' ? 'DECLINED' : 'NEEDS_REVIEW';
       return {
         ...a,
-        status: newStatus as any,
+        status: newStatus,
+        final_decision: newStatus,
+        is_officer_overridden: true,
         updatedAt: new Date().toISOString(),
         auditLogs: [
           ...(a.auditLogs || []),
           {
             id: 'aud-' + Date.now(),
             action: `MANUAL_OVERRIDE_${payload.action}`,
+            officer_id: 'EMP-90421',
+            officer_name: 'Dr. Arulmozhi Varman',
+            officer_title: 'Chief Underwriting Officer',
             timestamp: new Date().toISOString(),
             metadata: `Officer: Dr. Arulmozhi Varman (EMP-90421). Justification: ${payload.justification}`,
+            justification: payload.justification,
           },
         ],
       };
@@ -936,9 +1117,9 @@ export const getAuditTrailApi = async (applicationId: string) => {
   if (!isStaticDeployment()) {
     try {
       const res = await apiClient.get(`/audit/trail/${applicationId}`);
-      return res.data;
+      if (Array.isArray(res.data)) return res.data;
     } catch (e) {
-      console.warn('API /audit/trail failed, using client fallback');
+      console.warn('API /audit/trail fallback');
     }
   }
   const apps = getStoredApplications();
@@ -958,15 +1139,24 @@ export const executeDisbursementApi = async (payload: {
   if (!isStaticDeployment()) {
     try {
       const res = await apiClient.post('/disbursement/execute', payload);
-      return res.data;
+      if (res.data?.status === 'SUCCESS' || res.data?.disbursement_amount) return res.data;
     } catch (e) {
-      console.warn('API /disbursement/execute failed, using client fallback');
+      console.warn('API /disbursement/execute fallback');
     }
   }
 
   const apps = getStoredApplications();
   const app = apps.find((a) => a.id === payload.application_id) || apps[0];
-  const disburseAmount = app.loanAmount || 500000;
+  const disburseAmount = app.loanAmount || app.requested_amount || 500000;
+
+  const kfsData = {
+    loan_id: payload.application_id,
+    sanction_date: new Date().toISOString().split('T')[0],
+    annual_percentage_rate: 10.5,
+    cooling_off_period_days: 3,
+    penal_charges_policy: 'Zero penal charge within cooling-off period (100% principal refund)',
+    regulated_entity: 'FinTech Digital Lending Facility (Regulated by RBI DLG Guidelines 2022/2023)',
+  };
 
   return {
     status: 'SUCCESS',
@@ -979,6 +1169,7 @@ export const executeDisbursementApi = async (payload: {
     bank_name: payload.bank_name || 'State Bank of India (SBI)',
     bank_account_masked: 'XXXXXXXX4419',
     timestamp: new Date().toISOString(),
+    kfs_data: kfsData,
   };
 };
 
@@ -986,9 +1177,9 @@ export const getKfsStatementApi = async (applicationId: string) => {
   if (!isStaticDeployment()) {
     try {
       const res = await apiClient.get(`/disbursement/kfs/${applicationId}`);
-      return res.data;
+      if (res.data?.annual_percentage_rate) return res.data;
     } catch (e) {
-      console.warn('API /disbursement/kfs failed, using client fallback');
+      console.warn('API /disbursement/kfs fallback');
     }
   }
   return {
@@ -1008,9 +1199,9 @@ export const getEbmMetricsApi = async (): Promise<ModelMetrics> => {
   if (!isStaticDeployment()) {
     try {
       const res = await apiClient.get('/underwriting/metrics');
-      return res.data;
+      if (res.data?.ebm) return res.data;
     } catch (e) {
-      console.warn('API /underwriting/metrics failed, using client fallback');
+      console.warn('API /underwriting/metrics fallback');
     }
   }
   return {
@@ -1090,8 +1281,9 @@ export const updateApplicationStatusApi = async (id: string, status: string, rea
 };
 
 export const getApplicationByIdApi = async (id: string) => {
-  const detail = await getApplicationDetailApi(id);
-  return detail.application;
+  const apps = getStoredApplications();
+  const app = apps.find((a) => a.id === id) || apps[0];
+  return app;
 };
 
 export const getApplicationsApi = async () => {
