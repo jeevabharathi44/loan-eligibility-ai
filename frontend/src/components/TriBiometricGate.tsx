@@ -48,7 +48,6 @@ export const TriBiometricGate: React.FC<TriBiometricGateProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const aadhaarFileRef = useRef<HTMLInputElement>(null);
   const panFileRef = useRef<HTMLInputElement>(null);
-  const liveFileRef = useRef<HTMLInputElement>(null);
 
   // Sync initial photos if props change
   useEffect(() => {
@@ -112,8 +111,8 @@ export const TriBiometricGate: React.FC<TriBiometricGateProps> = ({
     setCameraActive(false);
   };
 
-  // Handle local file upload for Aadhaar, PAN, or Live Photo
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, target: 'aadhaar' | 'pan' | 'live') => {
+  // Handle local file upload for Aadhaar or PAN
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, target: 'aadhaar' | 'pan') => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -126,9 +125,6 @@ export const TriBiometricGate: React.FC<TriBiometricGateProps> = ({
       } else if (target === 'pan') {
         setPanPhoto(b64);
         runTriBiometricVerification(livePhoto, aadhaarPhoto, b64, simulateSpoof);
-      } else if (target === 'live') {
-        setLivePhoto(b64);
-        runTriBiometricVerification(b64, aadhaarPhoto, panPhoto, simulateSpoof);
       }
     };
     reader.readAsDataURL(file);
@@ -208,13 +204,7 @@ export const TriBiometricGate: React.FC<TriBiometricGateProps> = ({
         onChange={(e) => handleFileUpload(e, 'pan')}
         className="hidden"
       />
-      <input
-        type="file"
-        ref={liveFileRef}
-        accept="image/*"
-        onChange={(e) => handleFileUpload(e, 'live')}
-        className="hidden"
-      />
+
 
       {/* Module Title Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-200">
@@ -361,26 +351,30 @@ export const TriBiometricGate: React.FC<TriBiometricGateProps> = ({
 
           <canvas ref={canvasRef} className="hidden" />
 
-          {/* Camera & Upload Controls */}
+          {/* Camera Controls */}
           <div className="mt-2.5 flex flex-wrap items-center justify-center gap-1.5">
             {!cameraActive ? (
               <>
                 <button
                   type="button"
                   onClick={startCamera}
-                  className="px-2.5 py-1 bg-blue-50 text-blue-600 border border-blue-300 rounded-lg text-[11px] font-semibold hover:bg-blue-100 transition-colors flex items-center gap-1 shadow-2xs"
+                  className="px-3 py-1.5 bg-blue-50 text-blue-600 border border-blue-300 rounded-lg text-[11px] font-semibold hover:bg-blue-100 transition-colors flex items-center gap-1.5 shadow-2xs"
                 >
                   <Camera className="w-3.5 h-3.5 text-blue-600" />
-                  <span>{livePhoto ? 'Retake via Camera' : 'Open Live Camera'}</span>
+                  <span>{livePhoto ? 'Retake Live Camera' : 'Open Live Camera'}</span>
                 </button>
-                <button
-                  type="button"
-                  onClick={() => liveFileRef.current?.click()}
-                  className="px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-lg text-[11px] font-medium flex items-center gap-1 shadow-2xs"
-                >
-                  <Upload className="w-3.5 h-3.5 text-slate-500" />
-                  <span>Upload Live Photo</span>
-                </button>
+                {livePhoto && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLivePhoto(null);
+                      setVerificationResult(null);
+                    }}
+                    className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-[11px] font-medium"
+                  >
+                    Reset
+                  </button>
+                )}
               </>
             ) : (
               <div className="flex items-center gap-1">
@@ -551,16 +545,9 @@ export const TriBiometricGate: React.FC<TriBiometricGateProps> = ({
                 <button
                   type="button"
                   onClick={startCamera}
-                  className="px-2.5 py-1 bg-rose-600 text-white font-semibold rounded-md text-[11px] hover:bg-rose-700 shadow-2xs"
+                  className="px-3 py-1.5 bg-rose-600 text-white font-semibold rounded-md text-[11px] hover:bg-rose-700 shadow-2xs"
                 >
                   Retry with Live Camera
-                </button>
-                <button
-                  type="button"
-                  onClick={() => liveFileRef.current?.click()}
-                  className="px-2.5 py-1 bg-white border border-rose-300 text-rose-700 font-semibold rounded-md text-[11px] hover:bg-slate-50 shadow-2xs"
-                >
-                  Upload Matching Photo File
                 </button>
               </div>
             </div>
