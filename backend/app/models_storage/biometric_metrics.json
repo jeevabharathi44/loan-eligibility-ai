@@ -1,0 +1,14 @@
+{
+  "model_name": "Tri-Biometric Identity Verification Engine",
+  "algorithm": "Calibrated Random Forest Metric Learner (256-D Facial Feature Vector)",
+  "accuracy": 1.0,
+  "precision": 1.0,
+  "recall": 1.0,
+  "f1_score": 1.0,
+  "roc_auc": 1.0,
+  "training_samples": 1350,
+  "threshold": 0.75,
+  "applicant": "Jeeva Bharathi M",
+  "aadhaar_document": "2235 1313 2450",
+  "pan_document": "DELPJ9476P"
+}

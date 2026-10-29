@@ -3,14 +3,14 @@ import { Cpu, Database, Layout, Server } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="mt-20 border-t border-line/60 bg-card/40 py-12 px-4 sm:px-6 lg:px-8">
+    <footer className="mt-20 border-t border-slate-200 bg-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-xl font-bold mb-6 text-center text-ink">
+        <h2 className="text-xl font-bold mb-6 text-center text-slate-900">
           Production Architecture & Technologies
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <section className="bg-card/90 border border-line/70 rounded-2xl p-4 shadow-sm hover:border-cy/40 transition-colors">
+          <section className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:border-blue-400 transition-colors">
             <div className="flex items-center gap-2 mb-2 text-cy font-bold text-sm">
               <Cpu className="w-4 h-4" />
               <h3>Machine Learning</h3>
@@ -23,7 +23,7 @@ export const Footer: React.FC = () => {
             </ul>
           </section>
 
-          <section className="bg-card/90 border border-line/70 rounded-2xl p-4 shadow-sm hover:border-cy/40 transition-colors">
+          <section className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:border-blue-400 transition-colors">
             <div className="flex items-center gap-2 mb-2 text-cy font-bold text-sm">
               <Database className="w-4 h-4" />
               <h3>Backend & Database</h3>
@@ -36,7 +36,7 @@ export const Footer: React.FC = () => {
             </ul>
           </section>
 
-          <section className="bg-card/90 border border-line/70 rounded-2xl p-4 shadow-sm hover:border-cy/40 transition-colors">
+          <section className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:border-blue-400 transition-colors">
             <div className="flex items-center gap-2 mb-2 text-cy font-bold text-sm">
               <Layout className="w-4 h-4" />
               <h3>Frontend & UI</h3>
@@ -49,7 +49,7 @@ export const Footer: React.FC = () => {
             </ul>
           </section>
 
-          <section className="bg-card/90 border border-line/70 rounded-2xl p-4 shadow-sm hover:border-cy/40 transition-colors">
+          <section className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:border-blue-400 transition-colors">
             <div className="flex items-center gap-2 mb-2 text-cy font-bold text-sm">
               <Server className="w-4 h-4" />
               <h3>Deployment</h3>

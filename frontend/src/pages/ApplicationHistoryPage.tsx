@@ -47,18 +47,18 @@ export const ApplicationHistoryPage: React.FC<ApplicationHistoryProps> = ({ navi
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-ink flex items-center gap-2">
-            <History className="w-7 h-7 text-cy" />
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 flex items-center gap-2">
+            <History className="w-7 h-7 text-blue-600" />
             Application History
           </h1>
-          <p className="text-xs sm:text-sm text-mute mt-1">
+          <p className="text-xs sm:text-sm text-slate-600 mt-1">
             Archived record of all loan submissions, CIBIL checks, and model evaluations
           </p>
         </div>
 
         <button
           onClick={() => navigate('/apply')}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm text-xs transition-all self-start sm:self-auto"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/20 text-xs transition-all self-start sm:self-auto"
         >
           <PlusCircle className="w-4 h-4" />
           New Application
@@ -74,18 +74,18 @@ export const ApplicationHistoryPage: React.FC<ApplicationHistoryProps> = ({ navi
       {/* Filter and Search Bar */}
       <div className="app-card p-4 mb-6 flex flex-col sm:flex-row gap-3 items-center justify-between">
         <div className="relative w-full sm:w-72">
-          <Search className="w-4 h-4 text-mute absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-slate-600 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Search by ID or purpose..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-field/60 border border-line rounded-xl pl-9 pr-3 py-2 text-xs text-ink focus:outline-none focus:border-cy"
+            className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-cy"
           />
         </div>
 
         <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
-          <span className="text-[11px] text-mute font-bold mr-1 flex items-center gap-1">
+          <span className="text-[11px] text-slate-600 font-bold mr-1 flex items-center gap-1">
             <Filter className="w-3.5 h-3.5" />
             Status:
           </span>
@@ -95,8 +95,8 @@ export const ApplicationHistoryPage: React.FC<ApplicationHistoryProps> = ({ navi
               onClick={() => setStatusFilter(status)}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors whitespace-nowrap ${
                 statusFilter === status
-                  ? 'bg-cy text-bg'
-                  : 'bg-field text-mute hover:text-ink hover:bg-line/40'
+                  ? 'bg-cy text-white'
+                  : 'bg-slate-50 text-slate-600 hover:text-slate-900 hover:bg-line/40'
               }`}
             >
               {status.replace('_', ' ')}
@@ -107,15 +107,15 @@ export const ApplicationHistoryPage: React.FC<ApplicationHistoryProps> = ({ navi
 
       {/* Applications Table / Cards */}
       {loading ? (
-        <div className="py-16 text-center text-mute text-xs">
-          <Activity className="w-8 h-8 text-cy animate-spin mx-auto mb-3" />
+        <div className="py-16 text-center text-slate-600 text-xs">
+          <Activity className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-3" />
           Loading applications...
         </div>
       ) : filteredApps.length === 0 ? (
         <div className="app-card p-12 text-center">
-          <History className="w-10 h-10 text-mute mx-auto mb-3 opacity-40" />
-          <h3 className="text-sm font-bold text-ink mb-1">No matching applications</h3>
-          <p className="text-xs text-mute mb-4">
+          <History className="w-10 h-10 text-slate-600 mx-auto mb-3 opacity-40" />
+          <h3 className="text-sm font-bold text-slate-900 mb-1">No matching applications</h3>
+          <p className="text-xs text-slate-600 mb-4">
             Try adjusting your search query or status filter.
           </p>
         </div>
@@ -124,7 +124,7 @@ export const ApplicationHistoryPage: React.FC<ApplicationHistoryProps> = ({ navi
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b border-line text-mute uppercase tracking-wider text-[10px] bg-field/30">
+                <tr className="border-b border-slate-200 text-slate-600 uppercase tracking-wider text-[10px] bg-slate-50">
                   <th className="p-4 font-semibold">Application Ref</th>
                   <th className="p-4 font-semibold">Date</th>
                   <th className="p-4 font-semibold">Loan Request</th>
@@ -138,27 +138,27 @@ export const ApplicationHistoryPage: React.FC<ApplicationHistoryProps> = ({ navi
                 {filteredApps.map((app) => {
                   const pred = app.predictions && app.predictions[0];
                   return (
-                    <tr key={app.id} className="hover:bg-field/40 transition-colors">
-                      <td className="p-4 font-medium text-ink">
+                    <tr key={app.id} className="hover:bg-slate-50 transition-colors">
+                      <td className="p-4 font-medium text-slate-900">
                         <div>
                           <span className="font-bold capitalize">{app.loanPurpose} Loan</span>
-                          <span className="block text-[10px] font-mono text-mute mt-0.5">
+                          <span className="block text-[10px] font-mono text-slate-600 mt-0.5">
                             {app.id.slice(0, 8)}...
                           </span>
                         </div>
                       </td>
-                      <td className="p-4 text-mute">
+                      <td className="p-4 text-slate-600">
                         {new Date(app.createdAt).toLocaleDateString()}
                       </td>
                       <td className="p-4">
-                        <span className="font-bold text-ink block">{formatINR(app.loanAmount)}</span>
-                        <span className="text-[10px] text-mute">{app.loanTenure} months tenure</span>
+                        <span className="font-bold text-slate-900 block">{formatINR(app.loanAmount)}</span>
+                        <span className="text-[10px] text-slate-600">{app.loanTenure} months tenure</span>
                       </td>
                       <td className="p-4">
                         {app.creditProfile ? (
-                          <span className="font-bold text-cy">{app.creditProfile.cibilScore}</span>
+                          <span className="font-bold text-blue-600">{app.creditProfile.cibilScore}</span>
                         ) : (
-                          <span className="text-mute">—</span>
+                          <span className="text-slate-600">—</span>
                         )}
                       </td>
                       <td className="p-4">
@@ -168,18 +168,18 @@ export const ApplicationHistoryPage: React.FC<ApplicationHistoryProps> = ({ navi
                         {pred ? (
                           <div className="flex items-center gap-1.5">
                             <RiskBadge risk={pred.riskLevel} />
-                            <span className="text-[10px] font-mono text-mute">
+                            <span className="text-[10px] font-mono text-slate-600">
                               {(pred.probability * 100).toFixed(0)}%
                             </span>
                           </div>
                         ) : (
-                          <span className="text-mute text-[10px]">Unscored</span>
+                          <span className="text-slate-600 text-[10px]">Unscored</span>
                         )}
                       </td>
                       <td className="p-4 text-right">
                         <button
                           onClick={() => navigate(`/applications/${app.id}`)}
-                          className="px-3 py-1.5 rounded-lg bg-field border border-line text-cy hover:border-cy font-bold transition-colors inline-flex items-center gap-1"
+                          className="px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-blue-600 hover:border-cy font-bold transition-colors inline-flex items-center gap-1"
                         >
                           <Eye className="w-3.5 h-3.5" />
                           View

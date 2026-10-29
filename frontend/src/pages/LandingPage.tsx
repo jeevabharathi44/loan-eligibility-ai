@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Sparkles, ArrowRight, Sliders, Lock, BarChart2, HeartHandshake, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { Sparkles, ArrowRight, Sliders, BarChart2, HeartHandshake, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
 interface LandingPageProps {
   navigate: (path: string) => void;
@@ -10,34 +10,34 @@ export const LandingPage: React.FC<LandingPageProps> = ({ navigate }) => {
   const { isAuthenticated } = useAuth();
 
   return (
-    <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
+    <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto font-sans">
       {/* Humanized Hero Header */}
       <div className="text-center mb-12">
-        <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold uppercase tracking-wider mb-4">
-          <HeartHandshake className="w-3.5 h-3.5 text-emerald-600" />
-          Loan Assistant — End-to-End Digital Lending & Disbursement
+        <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-cy/10 border border-cy/25 text-cy text-xs font-semibold uppercase tracking-wider mb-4">
+          <HeartHandshake className="w-3.5 h-3.5 text-cy" />
+          Fair & Human-Centered Lending Intelligence
         </div>
-        <h1 className="text-4xl sm:text-6xl font-black tracking-tight mb-4 leading-tight text-slate-900">
-          Transparent Loan Approvals <br />
-          <span className="text-blue-600">& Instant Digital Disbursement</span>
+        <h1 className="text-4xl sm:text-6xl font-black tracking-tight mb-4 leading-tight text-ink">
+          Clear, Transparent Loan Decisions <br />
+          <span className="text-cy">You Can Actually Understand</span>
         </h1>
-        <p className="text-slate-600 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-          Not just eligibility checks — Loan Assistant guides you through user document upload, automated DigiLocker verification, tri-biometric face matching, transparent EBM AI scoring, and complete digital loan disbursement.
+        <p className="text-mute text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+          Tired of mysterious loan rejections with zero explanation? We use Microsoft InterpretML's Glassbox AI to show you the exact math behind your score — so you're always in control of your financial future.
         </p>
 
         <div className="mt-8 flex flex-wrap justify-center gap-4">
           <button
             onClick={() => navigate(isAuthenticated ? '/apply' : '/login')}
-            className="flex items-center gap-2 px-8 py-3.5 rounded-xl font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/20 transition-all text-sm"
+            className="flex items-center gap-2 px-8 py-3.5 rounded-xl font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all text-sm"
           >
-            Apply & Check Loan Eligibility
-            <ArrowRight className="w-4 h-4" />
+            Check My Eligibility in 2 Minutes
+            <ArrowRight className="w-4 h-4 text-white" />
           </button>
           <button
             onClick={() => navigate('/model-metrics')}
-            className="flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold bg-white border border-slate-300 text-slate-800 hover:border-blue-400 transition-all text-sm shadow-2xs"
+            className="flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold bg-field border border-line text-ink hover:bg-field/70 shadow-sm transition-all text-sm"
           >
-            <BarChart2 className="w-4 h-4 text-blue-600" />
+            <BarChart2 className="w-4 h-4 text-cy" />
             Inspect Glassbox Metrics
           </button>
         </div>
@@ -45,8 +45,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ navigate }) => {
 
       {/* 3 Pillars of Humanized Lending */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-16">
-        <div className="app-card p-6 border border-line/60">
-          <div className="w-12 h-12 rounded-xl bg-cy/10 border border-cy/30 flex items-center justify-center text-cy mb-4">
+        <div className="app-card p-6">
+          <div className="w-12 h-12 rounded-xl bg-cy/15 border border-cy/30 flex items-center justify-center text-cy mb-4">
             <Sparkles className="w-6 h-6" />
           </div>
           <h3 className="text-lg font-bold mb-2 text-ink">Zero Mystery Algorithms</h3>
@@ -55,8 +55,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ navigate }) => {
           </p>
         </div>
 
-        <div className="app-card p-6 border border-line/60">
-          <div className="w-12 h-12 rounded-xl bg-ok/10 border border-ok/30 flex items-center justify-center text-ok mb-4">
+        <div className="app-card p-6">
+          <div className="w-12 h-12 rounded-xl bg-ok/15 border border-ok/30 flex items-center justify-center text-ok mb-4">
             <Sliders className="w-6 h-6" />
           </div>
           <h3 className="text-lg font-bold mb-2 text-ink">Credit Habit Verifier</h3>
@@ -65,59 +65,86 @@ export const LandingPage: React.FC<LandingPageProps> = ({ navigate }) => {
           </p>
         </div>
 
-        <div className="app-card p-6 border border-line/60">
-          <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 mb-4">
+        <div className="app-card p-6">
+          <div className="w-12 h-12 rounded-xl bg-warn/15 border border-warn/30 flex items-center justify-center text-warn mb-4">
             <ShieldCheck className="w-6 h-6" />
           </div>
           <h3 className="text-lg font-bold mb-2 text-ink">Actionable Coaching</h3>
           <p className="text-xs sm:text-sm text-mute leading-relaxed">
-            If your application needs review or is declined, we don't leave you stranded. We provide a personalized roadmap with 3 concrete steps to build your score.
+            If your application needs review or is declined, we don't leave you stranded. We provide a personalized roadmap with concrete steps to build your score.
           </p>
         </div>
       </div>
 
       {/* Humanized Process Walkthrough */}
-      <div className="app-card p-8 border border-line/70 my-12">
-        <h2 className="text-2xl font-black text-center mb-2">
-          How Your Assessment Works
-        </h2>
-        <p className="text-xs text-mute text-center mb-8">
-          4 simple, human-guided steps with zero paperwork required.
-        </p>
+      <div className="app-card p-8 my-12">
+        <div className="text-center max-w-xl mx-auto mb-10">
+          <h2 className="text-2xl sm:text-3xl font-black mb-2 text-ink">
+            A Respectful, 4-Step Journey
+          </h2>
+          <p className="text-mute text-xs sm:text-sm">
+            Designed to empower borrowers with total clarity and zero hidden gotchas.
+          </p>
+        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="p-4 rounded-xl bg-field/60 border border-line">
-            <span className="text-xs font-mono font-bold text-cy">01. ABOUT YOU</span>
-            <h4 className="font-bold text-sm mt-1 mb-1.5">Personal Context</h4>
-            <p className="text-xs text-mute leading-relaxed">
-              Tell us about your earning stability, career vintage, and family dependents.
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="bg-field/60 rounded-xl p-4 border border-line text-center">
+            <div className="w-8 h-8 rounded-full bg-cy text-white font-black flex items-center justify-center mx-auto mb-3 text-sm">
+              1
+            </div>
+            <h4 className="font-bold text-sm mb-1 text-ink">Share Identity</h4>
+            <p className="text-mute text-xs">
+              Quick verification through Government of India's DigiLocker Meri Pehchaan SSO.
             </p>
           </div>
 
-          <div className="p-4 rounded-xl bg-field/60 border border-line">
-            <span className="text-xs font-mono font-bold text-cy">02. LOAN GOALS</span>
-            <h4 className="font-bold text-sm mt-1 mb-1.5">Affordability Check</h4>
-            <p className="text-xs text-mute leading-relaxed">
-              Explore your ideal loan amount with live monthly EMI and comfortable DTI ratios.
+          <div className="bg-field/60 rounded-xl p-4 border border-line text-center">
+            <div className="w-8 h-8 rounded-full bg-cy text-white font-black flex items-center justify-center mx-auto mb-3 text-sm">
+              2
+            </div>
+            <h4 className="font-bold text-sm mb-1 text-ink">Tri-Biometrics</h4>
+            <p className="text-mute text-xs">
+              3-way cross-verification across Aadhaar, PAN card, and live camera feed with liveness check.
             </p>
           </div>
 
-          <div className="p-4 rounded-xl bg-field/60 border border-line">
-            <span className="text-xs font-mono font-bold text-cy">03. CREDIT HEALTH</span>
-            <h4 className="font-bold text-sm mt-1 mb-1.5">CIBIL Verification</h4>
-            <p className="text-xs text-mute leading-relaxed">
-              Verify your credit score with transparent habit consistency scoring.
+          <div className="bg-field/60 rounded-xl p-4 border border-line text-center">
+            <div className="w-8 h-8 rounded-full bg-cy text-white font-black flex items-center justify-center mx-auto mb-3 text-sm">
+              3
+            </div>
+            <h4 className="font-bold text-sm mb-1 text-ink">Glassbox Math</h4>
+            <p className="text-mute text-xs">
+              EBM model computes exact point penalties and bonuses for transparent review.
             </p>
           </div>
 
-          <div className="p-4 rounded-xl bg-field/60 border border-line">
-            <span className="text-xs font-mono font-bold text-cy">04. SANCTION & DISBURSEMENT</span>
-            <h4 className="font-bold text-sm mt-1 mb-1.5">Instant Transfer</h4>
-            <p className="text-xs text-mute leading-relaxed">
-              Receive instant preliminary approval, sign digital agreement, and execute automated loan disbursement with an official UTR ledger receipt.
+          <div className="bg-field/60 rounded-xl p-4 border border-line text-center">
+            <div className="w-8 h-8 rounded-full bg-ok text-white font-black flex items-center justify-center mx-auto mb-3 text-sm">
+              4
+            </div>
+            <h4 className="font-bold text-sm mb-1 text-ink">Instant Decision</h4>
+            <p className="text-mute text-xs">
+              Get an instant approval notification with digital NPCI e-mandate disbursement.
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Bottom CTA Card */}
+      <div className="app-card p-8 text-center bg-gradient-to-br from-card via-field to-card border border-cy/30 shadow-glow-cy">
+        <h3 className="text-2xl font-black mb-2 text-ink">
+          Ready to experience fair, transparent lending?
+        </h3>
+        <p className="text-mute text-xs sm:text-sm max-w-lg mx-auto mb-6">
+          Join thousands of applicants who understand their financial worth with explainable AI.
+        </p>
+        <button
+          onClick={() => navigate(isAuthenticated ? '/apply' : '/login')}
+          className="px-8 py-3.5 rounded-xl font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all text-sm inline-flex items-center gap-2"
+        >
+          Begin Loan Application
+          <ArrowRight className="w-4 h-4" />
+        </button>
       </div>
     </div>
   );

@@ -1,69 +1,67 @@
-# Machine Learning & Explainability — Loan Eligibility AI
+# Machine Learning Explainability (XAI) & InterpretML EBM Architecture
 
-## 1. Problem Statement
+## 1. The Glassbox Paradigm vs. Black-Box Neural Networks
 
-Credit underwriting requires high predictive accuracy to manage credit default risk, but banking regulations (e.g. RBI Fair Lending Practices, FCRA, Equal Credit Opportunity Act) strictly mandate that adverse decisions must be accompanied by specific, actionable reasons. Traditional "black-box" models (Deep Neural Networks, Random Forests, XGBoost) obscure why an applicant was approved or denied.
+In traditional credit scoring and underwriting, institutions frequently deploy black-box models (e.g. Deep Neural Networks, Multi-Layer Perceptrons, or Gradient Boosted Trees like XGBoost and LightGBM). While accurate, these architectures obscure the exact mathematical attribution of individual variables, violating:
+- **Reserve Bank of India (RBI) Fair Lending Practice Code**.
+- **Equal Credit Opportunity & Consumer Protection Directives**.
+- **Adverse Action Notice Requirements**: When an applicant is denied credit, the lender is legally obligated to disclose the exact primary factors causing the adverse decision.
 
-**Loan Eligibility AI** solves this dilemma by utilizing **InterpretML's Explainable Boosting Machine (EBM)**, which provides state-of-the-art predictive performance while remaining 100% mathematically interpretable ("glassbox").
-
----
-
-## 2. Dataset Provenance & Synthesis
-
-The dataset (`dataset/loan_credit_dataset.csv`) contains 3,500 samples modeling realistic Indian retail banking underwriting distributions:
-- **Demographics**: Age (21-65), Dependents (0-4), Employment Type (Salaried, Self-employed, Not employed).
-- **Financial Parameters**: Monthly income (log-normal, median ₹50,000), Active loans (0-4), Existing monthly obligations.
-- **Credit Bureau Attributes**: CIBIL credit score (300-900), On-time payment % (40-100%), Credit utilization % (5-98%), Credit vintage (years), Recent credit enquiries (0-12).
-- **Derived Financial Metrics**: Reducing balance monthly EMI (10.5% APR), Fixed Obligation to Income Ratio (DTI / FOIR), and Loan-to-Income (LTI).
+This platform implements the **Microsoft InterpretML Explainable Boosting Machine (EBM)**, an implementation of the **Generalized Additive Model with Pairwise Interactions ($GA^2M$)**.
 
 ---
 
-## 3. The Glassbox EBM Model
+## 2. Mathematical Formulation of EBM ($GA^2M$)
 
-The Explainable Boosting Machine is a Generalized Additive Model with pairwise interactions (GA2M):
+The Explainable Boosting Machine models the log-odds of loan approval as an exact additive combination of single-feature shape functions and pairwise interaction terms:
 
-$$g(E[y]) = \beta_0 + \sum_{i=1}^p f_i(x_i) + \sum_{i \ne j} f_{ij}(x_i, x_j)$$
+$$\text{logit}(P(\text{Approved})) = \ln\left(\frac{P}{1 - P}\right) = \beta_0 + \sum_{i=1}^{M} f_i(x_i) + \sum_{i < j} f_{ij}(x_i, x_j)$$
 
 Where:
-- $g(\cdot)$ is the logit link function.
-- $\beta_0$ is the global baseline intercept.
-- $f_i(x_i)$ is a univariate shape function computed via cyclic gradient boosted trees on one feature at a time with round-robin feature scheduling.
-- $f_{ij}(x_i, x_j)$ captures pairwise feature interaction effects.
-
-### Why EBM is Legally Compliant for Lending:
-1. **Exact Local Contributions**: Each feature's contribution $f_i(x_i)$ is an exact additive term in log-odds space. No post-hoc approximations (like SHAP sampling or LIME perturbations) are required.
-2. **Monotonicity & Auditing**: Credit risk policies can inspect the exact curve for CIBIL score or DTI ratio to ensure there are no unintended biases or non-monotonic anomalies.
+- $\beta_0$: The base log-odds intercept computed across the underlying training population.
+- $f_i(x_i)$: The individual feature attribution (spline function / step function) for feature $x_i$ (e.g., CIBIL score, DTI ratio, Income).
+- $f_{ij}(x_i, x_j)$: Bivariate interaction terms capturing non-linear coupled risk (e.g. DTI ratio $\times$ Monthly Income).
+- $P(\text{Approved})$: The calibrated output probability derived via the logistic sigmoid transform:
+  $$P(\text{Approved}) = \frac{1}{1 + \exp\left(-\text{logit}(P)\right)}$$
 
 ---
 
-## 4. Empirical Evaluation Results
+## 3. Local Feature Attribution & Logit Waterfall
 
-Both models were trained on 80% (2,800 samples) and evaluated on a holdout test split of 20% (700 samples):
+For every applicant application, the EBM engine extracts exact local attributions:
 
-| Evaluation Metric | Baseline (Logistic Regression) | Explainable Boosting Machine (EBM) |
-|---|---|---|
-| **Accuracy** | 87.43% | **96.43%** |
-| **Precision** | 85.27% | **96.23%** |
-| **Recall** | 81.48% | **94.44%** |
-| **F1-Score** | 83.33% | **95.33%** |
-| **ROC-AUC** | 0.9527 | **0.9962** |
+```
+  Base Intercept (β₀ = -0.420)
+       │
+       ├─► CIBIL Score (785)                  ──►  +1.285 logits (Prime Bonus)
+       ├─► Debt-to-Income (25.5%)             ──►  +0.840 logits (Low Obligation Bonus)
+       ├─► Employment Type (Salaried)         ──►  +0.620 logits (Income Stability)
+       ├─► Loan-to-Income Multiplier (0.44x)  ──►  +0.350 logits (Conservative Leverage)
+       ├─► Payment History (98.5%)            ──►  +0.410 logits (Disciplined Track Record)
+       ├─► Revolving Utilization (18.0%)      ──►  +0.210 logits (Prudent Revolving Balance)
+       │
+       ▼
+  Net Logit Sum = +3.295  ──►  P(Approved) = 93.4% (Prime Tier Sanction)
+```
 
-### Confusion Matrix on Test Holdout (700 samples)
-- **EBM**:
-  - True Negatives (Declined): **420**
-  - False Positives (Erroneous Approvals): **10**
-  - False Negatives (Missed Approvals): **15**
-  - True Positives (Approved): **255**
-- **Baseline (Logistic Regression)**:
-  - True Negatives: **392**, False Positives: **38**
-  - False Negatives: **50**, True Positives: **220**
+### Positive Credit Bonuses (+ Logits)
+- **High CIBIL Score ($\ge 750$)**: Reflects multi-year credit discipline with zero 90+ DPD defaults.
+- **Conservative DTI ($\le 50\%$)**: Leaves ample disposable cash flow for loan servicing.
+- **Corporate Salaried Employment**: Verifiable payroll credits minimize cash-flow volatility.
+
+### Negative Risk Penalties (- Logits)
+- **Subprime CIBIL Score ($< 580$)**: Elevates estimated probability of default.
+- **High DTI ($> 70\%$)**: Indicates borrower is over-leveraged and debt service is compromised.
+- **Unemployed Status / Excessive Enquiries ($> 5$ in 6 months)**: Indicates aggressive credit-seeking behavior.
 
 ---
 
-## 5. Dynamic Plain-English Explanation Engine
+## 4. Dynamic Underwriting Decision Gates (Module 5)
 
-Rather than hard-coding generic explanations, `ml-service/explain.py` derives plain-English explanations directly from the applicant's real numerical attributes and the exact mathematical contribution score ($f_i(x_i)$):
+The underwriting decision engine enforces strict regulatory decision gates:
 
-1. **Direction**: Positive contributions ($f_i > 0$) increase approval likelihood; negative contributions ($f_i < 0$) increase risk.
-2. **Magnitude**: Impact is graduated into "significantly" ($|f_i| > 1.2$), "moderately" ($|f_i| > 0.5$), or "slightly".
-3. **Context**: Specific metrics (e.g. DTI of 28.9%, CIBIL of 780 Prime, Salaried employment status) are injected to provide actionable financial feedback.
+| Risk Tier | Boundary Conditions | Calibrated Approval Probability | Regulatory Action |
+| :--- | :--- | :--- | :--- |
+| 🟢 **Prime Tier (Approved)** | CIBIL $\ge 700$, DTI $\le 50\%$, Salaried, 100% KYC & Biometrics ($\ge 75\%$) | **85% – 98%** | Instant automated sanction & IMPS disbursement |
+| 🟡 **Near-Prime (Needs Review)** | CIBIL 580–680, DTI 50%–70%, Self-Employed, or Name Disparity Flag | **50% – 65%** | Exception flagged for Dr. Arulmozhi Varman review |
+| 🔴 **Subprime (Declined)** | CIBIL $< 580$, DTI $> 70\%$, Unemployed, or Biometric/Document Mismatch | **8% – 25%** | Policy rejection with statutory Adverse Action notice |

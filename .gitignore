@@ -6,6 +6,7 @@ package-lock.json
 dist/
 build/
 *.egg-info/
+.vite/
 
 # Python
 __pycache__/
@@ -22,6 +23,16 @@ venv/
 .env.local
 *.log
 
+# Databases and temporary files
+*.db
+*.db-journal
+backend/*.db
+backend/*.db-journal
+backend_fastapi/*.db
+backend_fastapi/*.db-journal
+backend_fastapi/uploads/*
+!backend_fastapi/uploads/.gitkeep
+
 # Docker volume data
 mysql_data/
 
@@ -30,10 +41,3 @@ mysql_data/
 .idea/
 .DS_Store
 Thumbs.db
-
-# Runtime SQLite and temporary uploads
-backend_fastapi/*.db
-backend_fastapi/*.db-journal
-backend_fastapi/uploads/*
-!backend_fastapi/uploads/.gitkeep
-

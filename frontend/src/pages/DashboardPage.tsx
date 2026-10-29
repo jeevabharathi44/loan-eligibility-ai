@@ -46,8 +46,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
 
   if (loading) {
     return (
-      <div className="py-16 text-center text-mute text-sm max-w-4xl mx-auto">
-        <Activity className="w-8 h-8 text-cy animate-spin mx-auto mb-3" />
+      <div className="py-16 text-center text-slate-600 text-sm max-w-4xl mx-auto">
+        <Activity className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-3" />
         Loading your underwriting portfolio...
       </div>
     );
@@ -61,40 +61,17 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900">
             Welcome back, <span className="text-blue-600">{user?.name}</span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Loan Assistant Hub: Track your loan applications, DigiLocker KYC verification, and disbursement transactions
+          <p className="text-xs sm:text-sm text-slate-600 mt-1">
+            Real-time status of your credit profiles and explainable AI loan assessments
           </p>
         </div>
 
         <button
           onClick={() => navigate('/apply')}
-          className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all text-sm shrink-0"
+          className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold bg-gradient-to-r from-cy to-blue-600 text-white shadow-md shadow-cy/20 hover:opacity-95 transition-all text-sm shrink-0"
         >
           <PlusCircle className="w-4 h-4" />
-          Apply for Loan
-        </button>
-      </div>
-
-      {/* Feature Announcement Bar */}
-      <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-emerald-50 via-blue-50 to-indigo-50 border border-emerald-200 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
-            LA
-          </div>
-          <div>
-            <span className="font-black text-slate-900 block">
-              Loan Assistant: End-to-End Digital Lending & Transaction Platform
-            </span>
-            <span className="text-slate-600 text-[11px]">
-              Apply with your documents, verify via DigiLocker, check Aadhaar-to-PAN face biometrics, and execute real-time loan disbursements.
-            </span>
-          </div>
-        </div>
-        <button
-          onClick={() => navigate('/apply')}
-          className="px-3.5 py-1.5 rounded-lg font-bold bg-emerald-700 hover:bg-emerald-800 text-white text-[11px] shrink-0"
-        >
-          Check Eligibility & Apply →
+          New Application
         </button>
       </div>
 
@@ -107,11 +84,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
       {/* KPI Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
         <div className="app-card p-4">
-          <div className="flex items-center justify-between text-mute text-xs mb-1">
+          <div className="flex items-center justify-between text-slate-600 text-xs mb-1">
             <span>Total</span>
-            <FileText className="w-4 h-4 text-mute" />
+            <FileText className="w-4 h-4 text-slate-600" />
           </div>
-          <div className="text-2xl font-black text-ink">{stats?.totalApplications || 0}</div>
+          <div className="text-2xl font-black text-slate-900">{stats?.totalApplications || 0}</div>
         </div>
 
         <div className="app-card p-4">
@@ -139,19 +116,19 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
         </div>
 
         <div className="app-card p-4">
-          <div className="flex items-center justify-between text-cy text-xs mb-1">
+          <div className="flex items-center justify-between text-blue-600 text-xs mb-1">
             <span>Avg CIBIL</span>
             <TrendingUp className="w-4 h-4" />
           </div>
-          <div className="text-2xl font-black text-cy">
+          <div className="text-2xl font-black text-blue-600">
             {stats?.averageCibil ? stats.averageCibil : '—'}
           </div>
         </div>
 
         <div className="app-card p-4">
-          <div className="flex items-center justify-between text-mute text-xs mb-1">
+          <div className="flex items-center justify-between text-slate-600 text-xs mb-1">
             <span>ML Status</span>
-            <Activity className="w-4 h-4 text-cy" />
+            <Activity className="w-4 h-4 text-blue-600" />
           </div>
           <div className="text-xs font-bold text-ok mt-2 flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-ok animate-pulse" />
@@ -163,10 +140,10 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
       {/* Recent Applications Section */}
       <div className="app-card p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-ink">Recent Applications</h2>
+          <h2 className="text-lg font-bold text-slate-900">Recent Applications</h2>
           <button
             onClick={() => navigate('/history')}
-            className="text-xs text-cy font-bold hover:underline flex items-center gap-1"
+            className="text-xs text-blue-600 font-bold hover:underline flex items-center gap-1"
           >
             View all history
             <ArrowRight className="w-3.5 h-3.5" />
@@ -174,15 +151,15 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
         </div>
 
         {!stats?.recentApplications || stats.recentApplications.length === 0 ? (
-          <div className="text-center py-12 border border-dashed border-line rounded-xl">
-            <FileText className="w-10 h-10 text-mute mx-auto mb-3 opacity-50" />
-            <h3 className="text-sm font-bold text-ink mb-1">No loan applications filed yet</h3>
-            <p className="text-xs text-mute mb-4 max-w-sm mx-auto">
+          <div className="text-center py-12 border border-dashed border-slate-200 rounded-xl">
+            <FileText className="w-10 h-10 text-slate-600 mx-auto mb-3 opacity-50" />
+            <h3 className="text-sm font-bold text-slate-900 mb-1">No loan applications filed yet</h3>
+            <p className="text-xs text-slate-600 mb-4 max-w-sm mx-auto">
               Ready to check your loan eligibility? Launch the explainable AI assessment wizard to get instant risk scoring.
             </p>
             <button
               onClick={() => navigate('/apply')}
-              className="px-4 py-2 rounded-xl text-xs font-bold bg-field border border-line text-cy hover:border-cy transition-colors"
+              className="px-4 py-2 rounded-xl text-xs font-bold bg-slate-50 border border-slate-200 text-blue-600 hover:border-cy transition-colors"
             >
               Start First Application
             </button>
@@ -191,7 +168,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b border-line text-mute uppercase tracking-wider text-[10px]">
+                <tr className="border-b border-slate-200 text-slate-600 uppercase tracking-wider text-[10px]">
                   <th className="pb-3 font-semibold">Application</th>
                   <th className="pb-3 font-semibold">Amount</th>
                   <th className="pb-3 font-semibold">Tenure</th>
@@ -205,20 +182,20 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
                 {stats.recentApplications.map((app) => {
                   const latestPred = app.predictions && app.predictions[0];
                   return (
-                    <tr key={app.id} className="hover:bg-field/40 transition-colors">
-                      <td className="py-3 font-medium text-ink">
+                    <tr key={app.id} className="hover:bg-slate-50 transition-colors">
+                      <td className="py-3 font-medium text-slate-900">
                         <div>
                           <span className="font-bold capitalize">{app.loanPurpose} Loan</span>
-                          <span className="block text-[10px] text-mute font-mono">
+                          <span className="block text-[10px] text-slate-600 font-mono">
                             {new Date(app.createdAt).toLocaleDateString()}
                           </span>
                         </div>
                       </td>
-                      <td className="py-3 font-bold text-ink">
+                      <td className="py-3 font-bold text-slate-900">
                         {formatINR(app.loanAmount)}
                       </td>
-                      <td className="py-3 text-mute">{app.loanTenure} mo</td>
-                      <td className="py-3 font-semibold text-cy">
+                      <td className="py-3 text-slate-600">{app.loanTenure} mo</td>
+                      <td className="py-3 font-semibold text-blue-600">
                         {app.creditProfile ? app.creditProfile.cibilScore : '—'}
                       </td>
                       <td className="py-3">
@@ -228,13 +205,13 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
                         {latestPred ? (
                           <RiskBadge risk={latestPred.riskLevel} />
                         ) : (
-                          <span className="text-mute text-[10px]">Pending AI</span>
+                          <span className="text-slate-600 text-[10px]">Pending AI</span>
                         )}
                       </td>
                       <td className="py-3 text-right">
                         <button
                           onClick={() => navigate(`/applications/${app.id}`)}
-                          className="px-2.5 py-1 rounded-lg bg-field border border-line text-cy hover:border-cy transition-colors text-[11px] font-bold"
+                          className="px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-blue-600 hover:border-cy transition-colors text-[11px] font-bold"
                         >
                           Details
                         </button>

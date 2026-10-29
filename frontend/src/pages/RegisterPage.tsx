@@ -22,7 +22,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ navigate }) => {
 
     try {
       await register(name, email, password, role);
-      navigate('/dashboard');
+      navigate('/apply');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Registration failed. Please check your details.');
     } finally {
@@ -33,39 +33,39 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ navigate }) => {
   return (
     <div className="py-12 px-4 max-w-md mx-auto">
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-cy to-blue-600 mb-3 shadow-lg shadow-cy/25">
-          <Shield className="w-6 h-6 text-bg" />
+        <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-[#007074] mb-3 shadow-sm">
+          <Shield className="w-6 h-6 text-white stroke-[2.2]" />
         </div>
-        <h1 className="text-2xl font-black text-ink">Join Loan Assistant</h1>
-        <p className="text-xs text-mute mt-1">Digital Personal Loan Processing, Verification & Instant Disbursement</p>
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Create an Account</h1>
+        <p className="text-xs text-slate-400 mt-1">Get started with explainable AI loan evaluations</p>
       </div>
 
-      <div className="app-card p-6 sm:p-8">
+      <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm">
         {error && (
-          <div className="mb-4 p-3 rounded-xl bg-bad/10 border border-bad/30 flex items-center gap-2 text-bad text-xs">
-            <AlertCircle className="w-4 h-4 shrink-0" />
+          <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 flex items-center gap-2 text-red-600 text-xs font-medium">
+            <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-mute uppercase tracking-wider mb-1.5">
-              Full Name
+            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+              FULL NAME
             </label>
             <input
               type="text"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Karthik Selvam"
-              className="w-full bg-field/60 border border-line rounded-xl px-4 py-2.5 text-sm text-ink focus:outline-none focus:border-cy"
+              placeholder="e.g. Arjun Sharma"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100 shadow-sm transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-mute uppercase tracking-wider mb-1.5">
-              Email Address
+            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+              EMAIL ADDRESS
             </label>
             <input
               type="email"
@@ -73,13 +73,13 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ navigate }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="e.g. applicant@example.com"
-              className="w-full bg-field/60 border border-line rounded-xl px-4 py-2.5 text-sm text-ink focus:outline-none focus:border-cy"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100 shadow-sm transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-mute uppercase tracking-wider mb-1.5">
-              Password (min 6 characters)
+            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+              PASSWORD (MIN 6 CHARACTERS)
             </label>
             <input
               type="password"
@@ -88,18 +88,18 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ navigate }) => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full bg-field/60 border border-line rounded-xl px-4 py-2.5 text-sm text-ink focus:outline-none focus:border-cy"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100 shadow-sm transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-mute uppercase tracking-wider mb-1.5">
-              Account Role
+            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+              ACCOUNT ROLE
             </label>
             <select
               value={role}
               onChange={(e) => setRole(e.target.value as 'USER' | 'ADMIN')}
-              className="w-full bg-field/60 border border-line rounded-xl px-4 py-2.5 text-sm text-ink focus:outline-none focus:border-cy"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100 shadow-sm transition-all"
             >
               <option value="USER">Standard Applicant (USER)</option>
               <option value="ADMIN">Loan Underwriter (ADMIN)</option>
@@ -109,19 +109,19 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ navigate }) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-2 py-3 px-4 rounded-xl font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full mt-2 py-2.5 px-4 rounded-xl font-medium bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all text-sm flex items-center justify-center gap-2 disabled:opacity-50"
           >
-            <UserPlus className="w-4 h-4" />
-            {loading ? 'Creating Account...' : 'Register'}
+            <UserPlus className="w-4 h-4 text-white" />
+            <span>{loading ? 'Creating Account...' : 'Register'}</span>
           </button>
         </form>
 
-        <div className="mt-6 text-center text-xs text-mute">
+        <div className="mt-6 text-center text-xs text-slate-500">
           Already have an account?{' '}
           <button
             type="button"
             onClick={() => navigate('/login')}
-            className="text-cy font-bold hover:underline"
+            className="text-emerald-600 font-semibold hover:underline"
           >
             Sign in
           </button>

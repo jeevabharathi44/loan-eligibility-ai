@@ -72,7 +72,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ navigate }) 
 
   if (loading) {
     return (
-      <div className="py-20 text-center text-mute text-xs">
+      <div className="py-20 text-center text-slate-600 text-xs">
         <Activity className="w-8 h-8 text-warn animate-spin mx-auto mb-3" />
         Loading underwriter console & portfolio risk statistics...
       </div>
@@ -85,11 +85,11 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ navigate }) 
       <div className="mb-6">
         <div className="flex items-center gap-2">
           <ShieldAlert className="w-6 h-6 text-warn" />
-          <h1 className="text-2xl sm:text-3xl font-black text-ink">
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900">
             Underwriter <span className="text-warn">Admin Console</span>
           </h1>
         </div>
-        <p className="text-xs sm:text-sm text-mute mt-1">
+        <p className="text-xs sm:text-sm text-slate-600 mt-1">
           System-wide credit governance, institutional risk distributions, and manual decision overrides
         </p>
       </div>
@@ -103,19 +103,19 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ navigate }) 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
         <div className="app-card p-4">
-          <div className="flex items-center justify-between text-mute text-xs mb-1">
+          <div className="flex items-center justify-between text-slate-600 text-xs mb-1">
             <span>Registered Users</span>
-            <Users className="w-4 h-4 text-mute" />
+            <Users className="w-4 h-4 text-slate-600" />
           </div>
-          <div className="text-2xl font-black text-ink">{stats?.totalUsers || 0}</div>
+          <div className="text-2xl font-black text-slate-900">{stats?.totalUsers || 0}</div>
         </div>
 
         <div className="app-card p-4">
-          <div className="flex items-center justify-between text-mute text-xs mb-1">
+          <div className="flex items-center justify-between text-slate-600 text-xs mb-1">
             <span>Total Applications</span>
-            <FileCheck2 className="w-4 h-4 text-mute" />
+            <FileCheck2 className="w-4 h-4 text-slate-600" />
           </div>
-          <div className="text-2xl font-black text-ink">{stats?.totalApplications || 0}</div>
+          <div className="text-2xl font-black text-slate-900">{stats?.totalApplications || 0}</div>
         </div>
 
         <div className="app-card p-4">
@@ -139,15 +139,15 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ navigate }) 
 
       {/* Applications Management Table */}
       <div className="app-card overflow-hidden mb-8">
-        <div className="p-4 border-b border-line flex items-center justify-between">
-          <h2 className="text-sm font-bold text-ink">All Loan Applications</h2>
-          <span className="text-xs text-mute font-mono">Count: {applications.length}</span>
+        <div className="p-4 border-b border-slate-200 flex items-center justify-between">
+          <h2 className="text-sm font-bold text-slate-900">All Loan Applications</h2>
+          <span className="text-xs text-slate-600 font-mono">Count: {applications.length}</span>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-line text-mute uppercase tracking-wider text-[10px] bg-field/30">
+              <tr className="border-b border-slate-200 text-slate-600 uppercase tracking-wider text-[10px] bg-slate-50">
                 <th className="p-3.5 font-semibold">Applicant</th>
                 <th className="p-3.5 font-semibold">Exposure</th>
                 <th className="p-3.5 font-semibold">CIBIL</th>
@@ -160,28 +160,28 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ navigate }) 
               {applications.map((app) => {
                 const pred = app.predictions && app.predictions[0];
                 return (
-                  <tr key={app.id} className="hover:bg-field/40 transition-colors">
+                  <tr key={app.id} className="hover:bg-slate-50 transition-colors">
                     <td className="p-3.5">
-                      <strong className="text-ink block">{app.user?.name || 'Applicant'}</strong>
-                      <span className="text-[10px] text-mute">{app.user?.email}</span>
+                      <strong className="text-slate-900 block">{app.user?.name || 'Applicant'}</strong>
+                      <span className="text-[10px] text-slate-600">{app.user?.email}</span>
                     </td>
                     <td className="p-3.5">
-                      <span className="font-bold text-ink">{formatINR(app.loanAmount)}</span>
-                      <span className="text-[10px] text-mute block capitalize">{app.loanPurpose} • {app.loanTenure}m</span>
+                      <span className="font-bold text-slate-900">{formatINR(app.loanAmount)}</span>
+                      <span className="text-[10px] text-slate-600 block capitalize">{app.loanPurpose} • {app.loanTenure}m</span>
                     </td>
-                    <td className="p-3.5 font-bold text-cy">
+                    <td className="p-3.5 font-bold text-blue-600">
                       {app.creditProfile ? app.creditProfile.cibilScore : '—'}
                     </td>
                     <td className="p-3.5">
                       <StatusBadge status={app.status} />
                     </td>
                     <td className="p-3.5">
-                      {pred ? <RiskBadge risk={pred.riskLevel} /> : <span className="text-mute">—</span>}
+                      {pred ? <RiskBadge risk={pred.riskLevel} /> : <span className="text-slate-600">—</span>}
                     </td>
                     <td className="p-3.5 text-right space-x-1.5">
                       <button
                         onClick={() => navigate(`/applications/${app.id}`)}
-                        className="px-2.5 py-1 rounded-lg bg-field border border-line text-cy hover:border-cy font-bold transition-colors text-[11px]"
+                        className="px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-blue-600 hover:border-cy font-bold transition-colors text-[11px]"
                       >
                         Inspect
                       </button>
@@ -205,25 +205,25 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ navigate }) 
 
       {/* Decision Override Modal */}
       {selectedApp && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="app-card max-w-md w-full p-6 border-line">
-            <h3 className="text-base font-bold text-ink mb-1 flex items-center gap-2">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="app-card max-w-md w-full p-6 border-slate-200">
+            <h3 className="text-base font-bold text-slate-900 mb-1 flex items-center gap-2">
               <Edit3 className="w-4 h-4 text-warn" />
               Underwriter Decision Override
             </h3>
-            <p className="text-xs text-mute mb-4">
+            <p className="text-xs text-slate-600 mb-4">
               Override status for {selectedApp.user?.name} ({formatINR(selectedApp.loanAmount)})
             </p>
 
             <form onSubmit={handleStatusUpdate} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-mute uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
                   New Underwriting Status
                 </label>
                 <select
                   value={newStatus}
                   onChange={(e) => setNewStatus(e.target.value)}
-                  className="w-full bg-field border border-line rounded-xl px-3 py-2 text-xs text-ink focus:outline-none focus:border-cy"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-cy"
                 >
                   <option value="APPROVED">APPROVED</option>
                   <option value="NEEDS_REVIEW">NEEDS_REVIEW</option>
@@ -233,7 +233,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ navigate }) 
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-mute uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
                   Override Justification / Reason
                 </label>
                 <textarea
@@ -242,7 +242,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ navigate }) 
                   value={overrideReason}
                   onChange={(e) => setOverrideReason(e.target.value)}
                   placeholder="e.g. Supplementary collateral pledged or manual income verification approved."
-                  className="w-full bg-field border border-line rounded-xl p-3 text-xs text-ink focus:outline-none focus:border-cy"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:border-cy"
                 />
               </div>
 
@@ -250,14 +250,14 @@ export const AdminDashboardPage: React.FC<AdminDashboardProps> = ({ navigate }) 
                 <button
                   type="button"
                   onClick={() => setSelectedApp(null)}
-                  className="px-4 py-2 rounded-xl bg-field border border-line text-xs font-bold text-mute hover:text-ink"
+                  className="px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-600 hover:text-slate-900"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={updating}
-                  className="px-4 py-2 rounded-xl bg-warn text-bg text-xs font-bold hover:opacity-95"
+                  className="px-4 py-2 rounded-xl bg-warn text-white text-xs font-bold hover:opacity-95"
                 >
                   {updating ? 'Saving...' : 'Confirm Override'}
                 </button>
