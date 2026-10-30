@@ -1,6 +1,9 @@
 # Dependencies
 node_modules/
-package-lock.json
+backend-express-legacy/package-lock.json
+
+# Archives
+*.zip
 
 # Build outputs
 dist/
