@@ -1,6 +1,6 @@
 import os
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -94,7 +94,7 @@ if os.path.exists(frontend_dist_dir):
     async def serve_spa(full_path: str):
         # Don't intercept API routes or documentation
         if full_path.startswith("api") or full_path in ("docs", "redoc", "openapi.json"):
-            return None
+            raise HTTPException(status_code=404, detail="API endpoint or document not found")
         file_path = os.path.join(frontend_dist_dir, full_path)
         if full_path and os.path.exists(file_path) and os.path.isfile(file_path):
             return FileResponse(file_path)
